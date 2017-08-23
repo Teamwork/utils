@@ -1,4 +1,4 @@
-package mathutil // import "github.com/teamwork/mathutil"
+package mathutil // import "github.com/teamwork/utils/mathutil"
 
 import (
 	"math"

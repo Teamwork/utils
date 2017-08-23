@@ -1,4 +1,4 @@
-package htmlutil // import "github.com/teamwork/htmlutil"
+package htmlutil // import "github.com/teamwork/utils/htmlutil"
 
 import "regexp"
 

@@ -1,4 +1,4 @@
-package timeutil // import "github.com/teamwork/timeutil"
+package timeutil // import "github.com/teamwork/utils/timeutil"
 
 import "time"
 
