@@ -1,5 +1,5 @@
 // Package maputil provides a set if functions for working with maps.
-package maputil
+package maputil // import "github.com/teamwork/maputil"
 
 // Reverse the keys and values of a map.
 func Reverse(m map[string]string) map[string]string {

@@ -1,5 +1,5 @@
 // Package byteutil provides a set if functions for working with bytes.
-package byteutil
+package byteutil // import "github.com/teamwork/byteutil"
 
 // ToUTF8 converts a string to UTF8.
 //

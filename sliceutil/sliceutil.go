@@ -1,5 +1,5 @@
 // Package sliceutil provides a set if functions for working with slices.
-package sliceutil
+package sliceutil // import "github.com/teamwork/sliceutil"
 
 import (
 	"sort"
