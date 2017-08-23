@@ -1,2 +1,0 @@
-# utils
-Golang Utility Functions
