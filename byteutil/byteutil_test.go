@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/teamwork/desk/test/util/diff"
+	"github.com/teamwork/test/diff"
 )
 
 func TestToUTF8(t *testing.T) {

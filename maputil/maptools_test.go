@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teamwork/desk/test/util/diff"
+	"github.com/teamwork/test/diff"
 )
 
 func TestReverse(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/teamwork/desk/test/util/diff"
+	"github.com/teamwork/test/diff"
 )
 
 func TestIntsToString(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/teamwork/desk/test/util/diff"
+	"github.com/teamwork/test/diff"
 )
 
 func TestComplementsInt(t *testing.T) {
