@@ -3,7 +3,5 @@
 [![GoDoc](https://godoc.org/github.com/Teamwork/utils?status.svg)](https://godoc.org/github.com/Teamwork/utils)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Teamwork/utils)](https://goreportcard.com/report/github.com/Teamwork/utils)
 
-
-
-`utils` is a collection of small extensions to Go's standard library that we use
-in several projects.
+`utils` is a collection of small and often used extensions to Go's standard
+library that we use in several projects.
