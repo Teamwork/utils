@@ -143,3 +143,12 @@ func Difference(set []int64, others ...[]int64) []int64 {
 
 	return out
 }
+
+// Range creates an []int counting at "start" up to (and including) "end".
+func Range(start, end int) []int {
+	rng := make([]int, end-start+1)
+	for i := 0; i < len(rng); i++ {
+		rng[i] = start + i
+	}
+	return rng
+}
