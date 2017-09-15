@@ -333,3 +333,25 @@ func TestDifference(t *testing.T) {
 		})
 	}
 }
+
+func TestRange(t *testing.T) {
+	cases := []struct {
+		start, end int
+		want       []int
+	}{
+		{1, 5, []int{1, 2, 3, 4, 5}},
+		{0, 5, []int{0, 1, 2, 3, 4, 5}},
+		{-2, 5, []int{-2, -1, 0, 1, 2, 3, 4, 5}},
+		{-5, -1, []int{-5, -4, -3, -2, -1}},
+		{100, 105, []int{100, 101, 102, 103, 104, 105}},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v-%v", tc.start, tc.end), func(t *testing.T) {
+			out := Range(tc.start, tc.end)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
