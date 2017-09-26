@@ -355,3 +355,46 @@ func TestRange(t *testing.T) {
 		})
 	}
 }
+
+func TestFilterString(t *testing.T) {
+	cases := []struct {
+		fun  func(string) bool
+		in   []string
+		want []string
+	}{
+		{
+			FilterStringEmpty,
+			[]string(nil),
+			[]string(nil),
+		},
+		{
+			FilterStringEmpty,
+			[]string{},
+			[]string(nil),
+		},
+		{
+			FilterStringEmpty,
+			[]string{"1"},
+			[]string{"1"},
+		},
+		{
+			FilterStringEmpty,
+			[]string{"", "1", ""},
+			[]string{"1"},
+		},
+		{
+			FilterStringEmpty,
+			[]string{"", "1", "", "2", "asd", "", "", "", "zx", "", "a"},
+			[]string{"1", "2", "asd", "zx", "a"},
+		},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := FilterString(tc.in, tc.fun)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}

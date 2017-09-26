@@ -1,0 +1,11 @@
+#!/bin/sh
+
+usage="Setup the environment for Travis"
+
+mv $HOME/gopath/src/github.com/Teamwork $HOME/gopath/src/github.com/teamwork
+cd $HOME/gopath/src/github.com/teamwork/utils
+
+if [ -f Gopkg.toml ]; then
+	go get -u github.com/golang/dep/cmd/dep
+	dep ensure
+fi

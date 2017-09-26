@@ -152,3 +152,22 @@ func Range(start, end int) []int {
 	}
 	return rng
 }
+
+// FilterString filters a list. The function will be called for every item and
+// those that return false will not be included in the return value.
+func FilterString(list []string, fun func(string) bool) []string {
+	var ret []string
+	for _, e := range list {
+		if fun(e) {
+			ret = append(ret, e)
+		}
+	}
+
+	return ret
+}
+
+// FilterStringEmpty can be used as an argument for FilterString() and will
+// return false if e is empty or contains only whitespace.
+func FilterStringEmpty(e string) bool {
+	return strings.TrimSpace(e) != ""
+}

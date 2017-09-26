@@ -42,6 +42,7 @@ TRAVIS=${TRAVIS:-}
 # So scripts can override this.
 usage_func=${usage_func:-_usage}
 options_func=${options_func:-_parse_options}
+pre_test_func=${options_func:-:}
 
 # Usage info.
 _usage() {
