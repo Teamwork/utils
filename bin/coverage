@@ -36,6 +36,8 @@ test_pkgs=$(find -name "*_test.go" |
 # Cache
 go test -i -cover -covermode=set $test_tags $(go list ./... | grep -v /vendor/)
 
+$pre_test_func
+
 for pkg in $test_pkgs; do
 	go test \
 		$test_tags \

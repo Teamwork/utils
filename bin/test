@@ -15,4 +15,6 @@ root="$(cd "$(dirname "$0")/.." && pwd | sed s,/Teamwork/,/teamwork/,)"
 # conditions. Uses a bit more memory, but we usually have enough of that.
 export GORACE="history_size=4"
 
-go test -race $test_tags $(go list ./... | grep -v /vendor/)
+$pre_test_func
+
+go test -v -race $test_tags $(go list ./... | grep -v /vendor/)
