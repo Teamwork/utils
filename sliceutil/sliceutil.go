@@ -171,3 +171,22 @@ func FilterString(list []string, fun func(string) bool) []string {
 func FilterStringEmpty(e string) bool {
 	return strings.TrimSpace(e) != ""
 }
+
+// FilterInt filters a list. The function will be called for every item and
+// those that return false will not be included in the return value.
+func FilterInt(list []int64, fun func(int64) bool) []int64 {
+	var ret []int64
+	for _, e := range list {
+		if fun(e) {
+			ret = append(ret, e)
+		}
+	}
+
+	return ret
+}
+
+// FilterIntEmpty can be used as an argument for FilterInt() and will
+// return false if e is empty or contains only whitespace.
+func FilterIntEmpty(e int64) bool {
+	return e != 0
+}
