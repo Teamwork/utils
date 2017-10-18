@@ -1,4 +1,4 @@
-// Package sliceutil provides a set if functions for working with slices.
+// Package sliceutil provides a set of functions for working with slices.
 package sliceutil // import "github.com/teamwork/utils/sliceutil"
 
 import (
