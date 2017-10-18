@@ -12,6 +12,8 @@ import (
 
 // IntList expands comma-separated values from a column to []int64, and stores
 // []int64 as a comma-separated string.
+//
+// This is safe for NULL values, in which case it will scan in to IntList(nil).
 type IntList []int64
 
 // Value implements the SQL Value function to determine what to store in the DB.
