@@ -5,3 +5,6 @@
 
 `utils` is a collection of small and often used extensions to Go's standard
 library that we use in several projects.
+
+The naming scheme is `[type]util` or `[pkgname]util`. If there already is a
+`*util` packge in stdlib it's named `utilx` (e.g. `ioutilx`).
