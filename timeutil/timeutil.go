@@ -32,3 +32,37 @@ func EndOfMonth(date time.Time) time.Time {
 func FormatAsZulu(t time.Time) string {
 	return t.Format("2006-01-02T15:04:05Z")
 }
+
+// MonthsTo returns the number of months from the current date the given date.
+//
+// The number of months is always rounded down, with a minimal value of 1.
+//
+// For example this returns 2:
+//
+//     MonthsTo(time.Now().Add(24 * time.Hour * 70))
+func MonthsTo(a time.Time) int {
+	var days int
+	startDate := time.Now()
+	lastDayOfYear := func(t time.Time) time.Time {
+		return time.Date(t.Year(), 12, 31, 0, 0, 0, 0, t.Location())
+	}
+
+	firstDayOfNextYear := func(t time.Time) time.Time {
+		return time.Date(t.Year()+1, 1, 1, 0, 0, 0, 0, t.Location())
+	}
+	cur := startDate
+	for cur.Year() < a.Year() {
+		// add 1 to count the last day of the year too.
+		days += lastDayOfYear(cur).YearDay() - cur.YearDay() + 1
+		cur = firstDayOfNextYear(cur)
+	}
+	days += a.YearDay() - cur.YearDay()
+	if startDate.AddDate(0, 0, days).After(a) {
+		days--
+	}
+	months := (days / 30)
+	if months == 0 {
+		months = 1
+	}
+	return months
+}

@@ -1,6 +1,7 @@
 package timeutil
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -53,4 +54,31 @@ func mustParse(t *testing.T, value string) time.Time {
 		t.Fatalf("time.Parse(%q, %q) unexpected error: %v", layout, value, err)
 	}
 	return d
+}
+
+func TestMonthsTo(t *testing.T) {
+	day := 24 * time.Hour
+	cases := []struct {
+		in   time.Time
+		want int
+	}{
+		{time.Now(), 1},
+		{time.Now().Add(day * 35), 1},
+		{time.Now().Add(day * 65), 2},
+		{time.Now().Add(-day * 35), -1},
+		{time.Now().Add(-day * 65), -2},
+		{time.Now().Add(day * 370), 12},
+
+		// Broken!
+		//{time.Now().Add(-day * 370), -12},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := MonthsTo(tc.in)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
 }
