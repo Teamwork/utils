@@ -1,11 +1,12 @@
-// Package cryptoutil provides a set of functions for 2-way encryption and hashing.
-package cryptoutil // import "github.com/teamwork/utils/cryptoutil"
+// Package aesutil provides a set of functions for 2-way encryption and hashing.
+package aesutil // import "github.com/teamwork/utils/aesutil"
 
 import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"io"
 )
 
@@ -41,7 +42,7 @@ func Decrypt(keyString string, base64Data string) ([]byte, error) {
 	}
 
 	if len(ciphertext) < aes.BlockSize {
-		return nil, err
+		return nil, errors.New("Ciphertext provided is smaller than AES block size")
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
