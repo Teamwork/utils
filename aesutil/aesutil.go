@@ -34,7 +34,10 @@ func Encrypt(keyString string, data []byte) (string, error) {
 // Decrypt a base64 string to binary data with AES using the key provided.
 func Decrypt(keyString string, base64Data string) ([]byte, error) {
 	key := []byte(keyString)
-	ciphertext, _ := base64.URLEncoding.DecodeString(base64Data)
+	ciphertext, err := base64.URLEncoding.DecodeString(base64Data)
+	if err != nil {
+		return nil, err
+	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {

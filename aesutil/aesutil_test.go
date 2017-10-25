@@ -13,7 +13,7 @@ const (
 	testCiphertext = "eTtvSIEnXOL6rhMSznY6HgfntkuWHZA16Z_s"
 )
 
-func TestInvalidKeys(t *testing.T) {
+func TestInvalidKeysAndData(t *testing.T) {
 	// Encrypt with empty key
 	data := []byte(testPlaintext)
 	_, err := Encrypt("", data)
@@ -49,6 +49,12 @@ func TestInvalidKeys(t *testing.T) {
 	_, err = Decrypt(testKeyString, "aaaabbbbcccc")
 	if err == nil {
 		t.Errorf("Decrypt succeeded with an invalid key size")
+	}
+
+	// Decrypt a non-base64 string
+	_, err = Decrypt(testKeyString, fmt.Sprintf("%s#@?`", testCiphertext))
+	if err == nil {
+		t.Errorf("Decrypt succeeded with an invalid base64 string")
 	}
 }
 
