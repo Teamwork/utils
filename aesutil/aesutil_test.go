@@ -1,6 +1,7 @@
 package aesutil
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/teamwork/test/diff"
@@ -14,7 +15,7 @@ const (
 
 func TestInvalidKeys(t *testing.T) {
 	// Encrypt with empty key
-	data := []byte("HELLO WORLD")
+	data := []byte(testPlaintext)
 	_, err := Encrypt("", data)
 	if err == nil {
 		t.Errorf("Encrypt succeeded with an empty key")
@@ -53,33 +54,35 @@ func TestInvalidKeys(t *testing.T) {
 
 func TestEncryptAndDecrypt(t *testing.T) {
 	tests := []string{
-		"HELLO WORLD",
+		testPlaintext,
 		"I love jam",
-		"HELLO WORLD",
+		testPlaintext,
 		"pls work already",
 		"",
 		"haaaalp",
 	}
 
-	for _, testData := range tests {
-		data := []byte(testData)
-		cipher, err := Encrypt(testKeyString, data)
-		if err != nil {
-			t.Error(err)
-		}
-		if string(cipher) == "" {
-			t.Errorf("Encrypt failed, cipher result is empty string")
-		}
+	for i, testData := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			data := []byte(testData)
+			cipher, err := Encrypt(testKeyString, data)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(cipher) == "" {
+				t.Fatalf("Encrypt failed, cipher result is empty string")
+			}
 
-		plain, err := Decrypt(testKeyString, cipher)
-		if err != nil {
-			t.Error(err)
-		}
-		if plain == nil {
-			t.Errorf("Decrypt failed, plaintext result is nil")
-		}
-		if string(plain) != testData {
-			t.Errorf(diff.Cmp(testData, string(plain)))
-		}
+			plain, err := Decrypt(testKeyString, cipher)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if plain == nil {
+				t.Fatal("Decrypt failed, plaintext result is nil")
+			}
+			if string(plain) != testData {
+				t.Fatalf(diff.Cmp(testData, string(plain)))
+			}
+		})
 	}
 }
