@@ -19,13 +19,14 @@ import (
 
 // DumpBody reads the body of a HTTP request without consuming it, so it can be
 // read again later.
+// It will read at most maxSize of bytes. Use -1 to read everything.
 //
 // It's based on httputil.DumpRequest.
 //
 // Copyright 2009 The Go Authors. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file:
 // https://golang.org/LICENSE
-func DumpBody(r *http.Request) ([]byte, error) {
+func DumpBody(r *http.Request, maxSize int64) ([]byte, error) {
 	if r.Body == nil {
 		return nil, nil
 	}
@@ -42,7 +43,11 @@ func DumpBody(r *http.Request) ([]byte, error) {
 	if chunked {
 		dest = httputil.NewChunkedWriter(dest)
 	}
-	_, err = io.Copy(dest, body)
+	if maxSize < 0 {
+		_, err = io.Copy(dest, body)
+	} else {
+		_, err = io.CopyN(dest, body, maxSize)
+	}
 	if err != nil {
 		return nil, err
 	}
