@@ -19,86 +19,124 @@ import (
 	"github.com/teamwork/test"
 )
 
-type dumpTest struct {
-	Req  http.Request
-	Body interface{} // optional []byte or func() io.ReadCloser to populate Req.Body
-
-	WantDump string
-	NoBody   bool // if true, set DumpRequest{,Out} body to false
-}
-
-var dumpTests = []dumpTest{
-
-	// HTTP/1.1 => chunked coding; body; empty trailer
-	{
-		Req: http.Request{
-			Method: "GET",
-			URL: &url.URL{
-				Scheme: "http",
-				Host:   "www.google.com",
-				Path:   "/search",
-			},
-			ProtoMajor:       1,
-			ProtoMinor:       1,
-			TransferEncoding: []string{"chunked"},
-		},
-		Body:     []byte("abcdef"),
-		WantDump: chunk("abcdef") + chunk(""),
-	},
-
-	// Request with Body > 8196 (default buffer size)
-	{
-		Req: http.Request{
-			Method: "POST",
-			URL: &url.URL{
-				Scheme: "http",
-				Host:   "post.tld",
-				Path:   "/",
-			},
-			Header: http.Header{
-				"Content-Length": []string{"8193"},
-			},
-			ContentLength: 8193,
-			ProtoMajor:    1,
-			ProtoMinor:    1,
-		},
-		Body:     bytes.Repeat([]byte("a"), 8193),
-		WantDump: strings.Repeat("a", 8193),
-	},
-}
-
-func TestDumpRequest(t *testing.T) {
+func TestDumpBody(t *testing.T) {
 	numg0 := runtime.NumGoroutine()
-	for i, tt := range dumpTests {
-		setBody := func() {
-			if tt.Body == nil {
-				return
-			}
-			switch b := tt.Body.(type) {
-			case []byte:
-				tt.Req.Body = ioutil.NopCloser(bytes.NewReader(b))
-			case func() io.ReadCloser:
-				tt.Req.Body = b()
-			default:
-				t.Fatalf("Test %d: unsupported Body of %T", i, tt.Body)
-			}
-		}
-		setBody()
-		if tt.Req.Header == nil {
-			tt.Req.Header = make(http.Header)
-		}
 
-		setBody()
-		dump, err := DumpBody(&tt.Req)
-		if err != nil {
-			t.Errorf("DumpBody #%d: %s", i, err)
-			continue
-		}
-		if string(dump) != tt.WantDump {
-			t.Errorf("DumpBody %d, expecting:\n%s\nGot:\n%s\n", i, tt.WantDump, string(dump))
-			continue
-		}
+	cases := []struct {
+		Req  http.Request
+		Body interface{} // optional []byte or func() io.ReadCloser to populate Req.Body
+
+		WantDump string
+		ReadN    int64
+		NoBody   bool // if true, set DumpRequest{,Out} body to false
+	}{
+
+		// HTTP/1.1 => chunked coding; body; empty trailer
+		{
+			Req: http.Request{
+				Method: "GET",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "www.google.com",
+					Path:   "/search",
+				},
+				ProtoMajor:       1,
+				ProtoMinor:       1,
+				TransferEncoding: []string{"chunked"},
+			},
+			Body:     []byte("abcdef"),
+			WantDump: chunk("abcdef") + chunk(""),
+			ReadN:    -1,
+		},
+		{
+			Req: http.Request{
+				Method: "GET",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "www.google.com",
+					Path:   "/search",
+				},
+				ProtoMajor:       1,
+				ProtoMinor:       1,
+				TransferEncoding: []string{"chunked"},
+			},
+			Body:     []byte("abcdef"),
+			WantDump: chunk("a") + chunk(""),
+			ReadN:    1,
+		},
+
+		// Request with Body > 8196 (default buffer size)
+		{
+			Req: http.Request{
+				Method: "POST",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "post.tld",
+					Path:   "/",
+				},
+				Header: http.Header{
+					"Content-Length": []string{"8193"},
+				},
+				ContentLength: 8193,
+				ProtoMajor:    1,
+				ProtoMinor:    1,
+			},
+			Body:     bytes.Repeat([]byte("a"), 8193),
+			WantDump: strings.Repeat("a", 8193),
+			ReadN:    -1,
+		},
+		{
+			Req: http.Request{
+				Method: "POST",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "post.tld",
+					Path:   "/",
+				},
+				Header: http.Header{
+					"Content-Length": []string{"8193"},
+				},
+				ContentLength: 8193,
+				ProtoMajor:    1,
+				ProtoMinor:    1,
+			},
+			Body:     bytes.Repeat([]byte("a"), 8293),
+			WantDump: strings.Repeat("a", 8193),
+			ReadN:    8193,
+		},
 	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			setBody := func() {
+				if tc.Body == nil {
+					return
+				}
+				switch b := tc.Body.(type) {
+				case []byte:
+					tc.Req.Body = ioutil.NopCloser(bytes.NewReader(b))
+				case func() io.ReadCloser:
+					tc.Req.Body = b()
+				default:
+					t.Fatalf("unsupported Body of %T", tc.Body)
+				}
+			}
+			setBody()
+			if tc.Req.Header == nil {
+				tc.Req.Header = make(http.Header)
+			}
+
+			setBody()
+			dump, err := DumpBody(&tc.Req, tc.ReadN)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(dump) != tc.WantDump {
+				t.Errorf("want: %s\ngot: %s\n", tc.WantDump, string(dump))
+			}
+		})
+	}
+
 	if dg := runtime.NumGoroutine() - numg0; dg > 4 {
 		buf := make([]byte, 4096)
 		buf = buf[:runtime.Stack(buf, true)]
