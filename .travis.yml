@@ -2,8 +2,11 @@ language: go
 go:
   - 1.8.x
   - 1.9.x
-before_install:
-  - mv $HOME/gopath/src/github.com/Teamwork $HOME/gopath/src/github.com/teamwork
+go_import_path: github.com/teamwork/utils
+notifications:
+  email: false
+install:
+  - ./bin/setup-travis
 script:
   - cd $HOME/gopath/src/github.com/teamwork/utils
   - ./bin/test
