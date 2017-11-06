@@ -43,6 +43,7 @@ func TestIntListScan(t *testing.T) {
 		{"", *new(IntList), ""},
 		{"1", IntList{1}, ""},
 		{"4, 5", IntList{4, 5}, ""},
+		{"4,   5", IntList{4, 5}, ""},
 		{"1, 1", IntList{1, 1}, ""},
 		{"1, 0, 2", IntList{1, 0, 2}, ""},
 		{"1,0,2", IntList{1, 0, 2}, ""},
