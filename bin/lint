@@ -5,14 +5,25 @@ usage="Run Go linter tools"
 # Setup
 #######
 set -euC
-root="$(cd "$(dirname "$0")/.." && pwd | sed s,/Teamwork/,/teamwork/,)"
+root="$(cd "$(dirname "$0")/.." && pwd)"
 . "$root/bin/start"
 
 # Run action
 ############
 
 tmpfile="$(mktemp)"
-paths=$(go list ./... | grep -v /vendor/ | sed -e "s#^$pkgname#.#")
+
+ignore_grep() {
+	local IFS="$(printf '\n\b')"
+	for d in $lint_ignore; do printf "|$d"; done
+}
+
+ignore_metalinter() {
+	local IFS="$(printf '\n\b')"
+	for d in $lint_ignore; do printf " -s $d"; done
+}
+
+paths=$(go list ./... | grep -Ev "/(vendor$(ignore_grep))" | sed -e "s#^$pkgname#.#")
 
 cleanup() {
 	rm -f "$tmpfile"
@@ -21,7 +32,7 @@ trap cleanup EXIT
 
 # Run gofmt first
 for f in $paths; do
-	gofmt -d "$f"/*.go
+	gofmt -s -d "$f"/*.go
 done >> "$tmpfile"
 
 if [ -s "$tmpfile" ]; then
@@ -66,6 +77,7 @@ metalinter() {
 }
 
 $(metalinter) --deadline=120s --vendor --tests --disable-all \
+	$(ignore_metalinter) \
 	--enable=vet \
 	--enable=golint \
 	--enable=ineffassign \

@@ -19,6 +19,13 @@ test_tags=${test_tags:-}
 # Verbose output?
 verbose=${verbose:-0}
 
+# Directory names to ignore in the ./bin/lint script; multiple directories are
+# separated by newlines.
+lint_ignore="${lint_ignore:-}"
+
+# Callback to run before "go test" in ./bin/test and ./bin/coverage.
+pre_test_func=${pre_test_func:-:}
+
 
 ###
 # For the following the defaults should almost always be okay. If not, then
@@ -42,7 +49,6 @@ TRAVIS=${TRAVIS:-}
 # So scripts can override this.
 usage_func=${usage_func:-_usage}
 options_func=${options_func:-_parse_options}
-pre_test_func=${options_func:-:}
 
 # Usage info.
 _usage() {
@@ -54,7 +60,7 @@ _usage() {
 	echo "  -h     Show this help"
 	echo "  -v     Enable verbose output"
 	echo "  -t     Set tag for Docker and main.version"
-	echo "  -b     Build tags to be past to go test -tags"
+	echo "  -b     Go build tag; can be given more than once"
 	echo
 }
 
@@ -65,7 +71,7 @@ _parse_options() {
 			h) $usage_func; exit 0 ;;
 			v) verbose=1; set -x ;;
 			t) tag=$OPTARG ;;
-			b) test_tags="-tags=$OPTARG" ;;
+			b) test_tags="$test_tags $OPTARG" ;;
 			*)
 				echo "error: unknown option '$option'"
 				$usage_func
@@ -73,6 +79,9 @@ _parse_options() {
 				;;
 		esac
 	done
+
+	[ -n "$test_tags" ] && test_tags="${test_tags# }"
+	return 0
 }
 
-$options_func $@
+$options_func "$@"
