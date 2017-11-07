@@ -64,6 +64,22 @@ func TestDumpBody(t *testing.T) {
 			WantDump: chunk("a") + chunk(""),
 			ReadN:    1,
 		},
+		{
+			Req: http.Request{
+				Method: "GET",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "www.google.com",
+					Path:   "/search",
+				},
+				ProtoMajor:       1,
+				ProtoMinor:       1,
+				TransferEncoding: []string{"chunked"},
+			},
+			Body:     []byte("abcdef"),
+			WantDump: chunk("ab") + chunk(""),
+			ReadN:    2,
+		},
 
 		// Request with Body > 8196 (default buffer size)
 		{
@@ -104,6 +120,41 @@ func TestDumpBody(t *testing.T) {
 			WantDump: strings.Repeat("a", 8193),
 			ReadN:    8193,
 		},
+		{
+			Req: http.Request{
+				Method: "POST",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "post.tld",
+					Path:   "/",
+				},
+				Header: http.Header{
+					"Content-Length": []string{"10"},
+				},
+				ContentLength: 10,
+				ProtoMajor:    1,
+				ProtoMinor:    1,
+			},
+			Body:     bytes.Repeat([]byte("a"), 10),
+			WantDump: strings.Repeat("a", 10),
+			ReadN:    15,
+		},
+		{
+			Req: http.Request{
+				Method: "GET",
+				URL: &url.URL{
+					Scheme: "http",
+					Host:   "www.google.com",
+					Path:   "/search",
+				},
+				ProtoMajor:       1,
+				ProtoMinor:       1,
+				TransferEncoding: []string{"chunked"},
+			},
+			Body:     []byte("abcdef"),
+			WantDump: chunk("abcdef") + chunk(""),
+			ReadN:    100,
+		},
 	}
 
 	for i, tc := range cases {
@@ -132,7 +183,7 @@ func TestDumpBody(t *testing.T) {
 				t.Fatal(err)
 			}
 			if string(dump) != tc.WantDump {
-				t.Errorf("want: %s\ngot: %s\n", tc.WantDump, string(dump))
+				t.Errorf("\nwant: %#v\ngot:  %#v\n", tc.WantDump, string(dump))
 			}
 		})
 	}

@@ -43,10 +43,14 @@ func DumpBody(r *http.Request, maxSize int64) ([]byte, error) {
 	if chunked {
 		dest = httputil.NewChunkedWriter(dest)
 	}
+
 	if maxSize < 0 {
 		_, err = io.Copy(dest, body)
 	} else {
 		_, err = io.CopyN(dest, body, maxSize)
+		if err == io.EOF {
+			err = nil
+		}
 	}
 	if err != nil {
 		return nil, err
