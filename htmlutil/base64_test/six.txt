@@ -1,1 +1,0 @@
-data-src without base64 <img src="http://testing.com/image.png" data-src="github.com" />
