@@ -65,15 +65,11 @@ if [ -n "$TRAVIS" ]; then
 	git fetch -q origin master:refs/remotes/origin/master
 
 	# Install for Travis.
-	go get -u gopkg.in/alecthomas/gometalinter.v1
-	gometalinter.v1 --install
+	go get -u github.com/alecthomas/gometalinter
+	gometalinter --install > /dev/null
 fi
 
-metalinter() {
-	which gometalinter || which gometalinter.v1
-}
-
-$(metalinter) --deadline=120s --vendor --sort=path --tests --disable-all \
+gometalinter --deadline=120s --vendor --sort=path --tests --disable-all \
 	$(ignore_metalinter) \
 	--enable=vet \
 	--enable=golint \
@@ -85,7 +81,11 @@ $(metalinter) --deadline=120s --vendor --sort=path --tests --disable-all \
 	--enable=interfacer \
 	--enable=unconvert \
 	--enable=goconst \
-	--enable=gas \
 	--enable=goimports \
 	--enable=lll --line-length=120 \
 	./...
+
+	# disabled for now as "_ = someErrorer()" gives "warning: Errors
+	# unhandled.,LOW,HIGH (gas)", which is annoying and can't be silenced as far
+	# as I can find.
+	#--enable=gas \

@@ -5,7 +5,6 @@ package httputilx
 // license that can be found in the LICENSE file.
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io"
@@ -197,30 +196,6 @@ func TestDumpBody(t *testing.T) {
 
 func chunk(s string) string {
 	return fmt.Sprintf("%x\r\n%s\r\n", len(s), s)
-}
-
-func mustParseURL(s string) *url.URL {
-	u, err := url.Parse(s)
-	if err != nil {
-		panic(fmt.Sprintf("Error parsing URL %q: %v", s, err))
-	}
-	return u
-}
-
-func mustNewRequest(method, url string, body io.Reader) *http.Request {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		panic(fmt.Sprintf("NewRequest(%q, %q, %p) err = %v", method, url, body, err))
-	}
-	return req
-}
-
-func mustReadRequest(s string) *http.Request {
-	req, err := http.ReadRequest(bufio.NewReader(strings.NewReader(s)))
-	if err != nil {
-		panic(err)
-	}
-	return req
 }
 
 // TODO: better to not depend on interwebz...
