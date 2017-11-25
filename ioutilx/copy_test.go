@@ -110,6 +110,8 @@ func TestCopyData(t *testing.T) {
 		{"nonexistent", "test/copydst", "no such file"},
 		{"test/file1", "test/file2", "already exists"},
 		{"test/fifo", "test/newfile", "named pipe"},
+		{"test/link1/asd", "test/dst1", "not a directory"},
+		{"test/file1", "/cantwritehere", "permission denied"},
 		{"test/file1", "test/dst1", ""},
 		{"test/link1", "test/dst1", ""},
 	}
@@ -141,6 +143,8 @@ func TestCopyMode(t *testing.T) {
 		{"test/file1", "test/file1", Modes{}, "same file"},
 		{"nonexistent", "test/copydst", Modes{}, "no such file"},
 		{"test/fifo", "test/newfile", Modes{}, "named pipe"},
+		{"test/link1/asd", "test/dst1", Modes{}, "not a directory"},
+		{"test/file1", "/cantwritehere", Modes{}, "no such file or directory"},
 
 		{"test/exec", "test/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
 	}
@@ -180,6 +184,8 @@ func TestCopy(t *testing.T) {
 		{"test/file1", "test/file1", Modes{}, "same file"},
 		{"nonexistent", "test/copydst", Modes{}, "no such file"},
 		{"test/fifo", "test/newfile", Modes{}, "named pipe"},
+		{"test/link1/asd", "test/dst1", Modes{}, "not a directory"},
+		{"test/file1", "/cantwritehere", Modes{}, "permission denied"},
 
 		{"test/exec", "test/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
 		{"test/exec", "test/dir1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
@@ -258,17 +264,21 @@ func TestCopyTree(t *testing.T) {
 			t.Error(err)
 		}
 	})
-
 	t.Run("dst-exists", func(t *testing.T) {
 		err := CopyTree("test", "test", nil)
 		if !test.ErrorContains(err, "already exists") {
 			t.Error(err)
 		}
 	})
-
 	t.Run("dst-nodir", func(t *testing.T) {
 		err := CopyTree("test/file1", "test", nil)
 		if !test.ErrorContains(err, "not a directory") {
+			t.Error(err)
+		}
+	})
+	t.Run("permission", func(t *testing.T) {
+		err := CopyTree("test", "/cant/write/here", nil)
+		if !test.ErrorContains(err, "permission denied") {
 			t.Error(err)
 		}
 	})
