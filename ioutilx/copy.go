@@ -1,10 +1,9 @@
-// Package fileutil provides high-level file operations.
-//
+package ioutilx
+
 // Note that these functions may not be portable to all systems. Specifically,
 // none of this is tested on Windows.
 //
 // This code is based on: https://github.com/termie/go-shutil
-package fileutil
 
 import (
 	"fmt"
