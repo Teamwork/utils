@@ -18,42 +18,42 @@ import (
 	"github.com/teamwork/utils/sliceutil"
 )
 
-// SameFileError is used when the source and destination file are the same file.
-type SameFileError struct {
+// ErrSameFile is used when the source and destination file are the same file.
+type ErrSameFile struct {
 	Src string
 	Dst string
 }
 
-func (e SameFileError) Error() string {
+func (e ErrSameFile) Error() string {
 	return fmt.Sprintf("%v and %v are the same file", e.Src, e.Dst)
 }
 
-// AlreadyExistsError is used when the destination already exists.
-type AlreadyExistsError struct {
+// ErrExists is used when the destination already exists.
+type ErrExists struct {
 	Dst string
 }
 
-func (e AlreadyExistsError) Error() string {
+func (e ErrExists) Error() string {
 	return fmt.Sprintf("%s already exists", e.Dst)
 }
 
-// NotADirectoryError is used when attempting to copy a directory tree that is
+// ErrNotDir is used when attempting to copy a directory tree that is
 // not a directory.
-type NotADirectoryError struct {
+type ErrNotDir struct {
 	Src string
 }
 
-func (e NotADirectoryError) Error() string {
+func (e ErrNotDir) Error() string {
 	return fmt.Sprintf("%s is not a directory", e.Src)
 }
 
-// SpecialFileError is used when the source or destination file is a special
+// ErrSpecialFile is used when the source or destination file is a special
 // file, and not something we can operate on.
-type SpecialFileError struct {
+type ErrSpecialFile struct {
 	FileInfo os.FileInfo
 }
 
-func (e SpecialFileError) Error() string {
+func (e ErrSpecialFile) Error() string {
 	var mode string
 	switch {
 	case (e.FileInfo.Mode() & os.ModeDevice) == os.ModeDevice:
@@ -73,7 +73,7 @@ func (e SpecialFileError) Error() string {
 }
 
 // IsSameFile reports if two files refer to the same file object. It will return
-// a SameFileError if it is.
+// a ErrSameFile if it is.
 //
 // It is not an error if one of the two files doesn't exist.
 func IsSameFile(src string, dst string) error {
@@ -94,20 +94,20 @@ func IsSameFile(src string, dst string) error {
 	}
 
 	if os.SameFile(srcInfo, dstInfo) {
-		return &SameFileError{Src: src, Dst: dst}
+		return &ErrSameFile{Src: src, Dst: dst}
 	}
 	return nil
 }
 
 // IsSpecialFile reports if this file is a special file such as a named pipe,
-// device file, or socket. If so it will return a SpecialFileError.
+// device file, or socket. If so it will return a ErrSpecialFile.
 func IsSpecialFile(fi os.FileInfo) error {
 	if (fi.Mode()&os.ModeDevice) == os.ModeDevice ||
 		(fi.Mode()&os.ModeNamedPipe) == os.ModeNamedPipe ||
 		(fi.Mode()&os.ModeSocket) == os.ModeSocket ||
 		(fi.Mode()&os.ModeCharDevice) == os.ModeCharDevice {
 
-		return &SpecialFileError{FileInfo: fi}
+		return &ErrSpecialFile{FileInfo: fi}
 	}
 
 	return nil
@@ -129,7 +129,7 @@ func CopyData(src, dst string) error {
 	}
 
 	if _, exists := os.Stat(dst); exists == nil {
-		return &AlreadyExistsError{dst}
+		return &ErrExists{dst}
 	}
 
 	// Do the actual copy.
@@ -318,11 +318,11 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		return errors.WithStack(err)
 	}
 	if !srcFileInfo.IsDir() {
-		return &NotADirectoryError{src}
+		return &ErrNotDir{src}
 	}
 	_, err = os.Open(dst)
 	if !os.IsNotExist(err) {
-		return &AlreadyExistsError{dst}
+		return &ErrExists{dst}
 	}
 
 	entries, err := ioutil.ReadDir(src)
