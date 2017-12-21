@@ -1,6 +1,8 @@
 package mathutil
 
 import (
+	"fmt"
+	"strconv"
 	"testing"
 )
 
@@ -43,4 +45,30 @@ func TestRoundPlus(t *testing.T) {
 		}
 	}
 
+}
+
+func TestIsSignedZero(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"1", false},
+		{"0", false},
+		{"-1", false},
+		{"-0", true},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			f, err := strconv.ParseFloat(tc.in, 64)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			out := IsSignedZero(f)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
 }
