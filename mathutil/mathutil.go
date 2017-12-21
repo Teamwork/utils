@@ -48,3 +48,8 @@ func Limit(v, lower, upper float64) float64 {
 func DivideCeil(count int64, pageSize int64) int64 {
 	return int64(math.Ceil(float64(count) / float64(pageSize)))
 }
+
+// IsSignedZero checks if this number is a signed zero (i.e. -0, instead of +0).
+func IsSignedZero(f float64) bool {
+	return math.Float64bits(f)^uint64(1<<63) == 0
+}
