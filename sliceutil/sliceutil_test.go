@@ -306,34 +306,6 @@ func TestInInt64Slice(t *testing.T) {
 	}
 }
 
-func TestDifference(t *testing.T) {
-	cases := []struct {
-		inSet    []int64
-		inOthers [][]int64
-		expected []int64
-	}{
-		{[]int64{}, [][]int64{}, []int64{}},
-		{nil, [][]int64{}, []int64{}},
-		{[]int64{}, nil, []int64{}},
-		{nil, nil, []int64{}},
-		{[]int64{1}, [][]int64{{1}}, []int64{}},
-		{[]int64{1, 2, 2, 3}, [][]int64{{1, 2, 2, 3}}, []int64{}},
-		{[]int64{1, 2, 2, 3}, [][]int64{{1, 2}, {3}}, []int64{}},
-		{[]int64{1, 2}, [][]int64{{1}}, []int64{2}},
-		{[]int64{1, 2, 3}, [][]int64{{1}}, []int64{2, 3}},
-		{[]int64{1, 2, 3}, [][]int64{{}, {1}}, []int64{2, 3}},
-	}
-
-	for i, tc := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := Difference(tc.inSet, tc.inOthers...)
-			if !reflect.DeepEqual(tc.expected, out) {
-				t.Errorf("\nout:      %#v\nexpected: %#v\n", out, tc.expected)
-			}
-		})
-	}
-}
-
 func TestRange(t *testing.T) {
 	cases := []struct {
 		start, end int
