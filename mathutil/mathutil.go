@@ -1,6 +1,7 @@
 package mathutil // import "github.com/teamwork/utils/mathutil"
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -52,4 +53,21 @@ func DivideCeil(count int64, pageSize int64) int64 {
 // IsSignedZero checks if this number is a signed zero (i.e. -0, instead of +0).
 func IsSignedZero(f float64) bool {
 	return math.Float64bits(f)^uint64(1<<63) == 0
+}
+
+// Byte is a float64 where the String() method prints out a human-redable
+// description.
+type Byte float64
+
+var units = []string{"B", "KiB", "MiB", "GiB", "TiB", "PiB"}
+
+func (b Byte) String() string {
+	i := 0
+	for ; i < len(units); i++ {
+		if b < 1024 {
+			return fmt.Sprintf("%.1f%s", b, units[i])
+		}
+		b /= 1024
+	}
+	return fmt.Sprintf("%.1f%s", b*1024, units[i-1])
 }

@@ -2,6 +2,7 @@ package mathutil
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"testing"
 )
@@ -66,6 +67,31 @@ func TestIsSignedZero(t *testing.T) {
 			}
 
 			out := IsSignedZero(f)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestByte(t *testing.T) {
+	cases := []struct {
+		in   float64
+		want string
+	}{
+		{500, "500.0B"},
+		{1023, "1023.0B"},
+		{1024, "1.0KiB"},
+		{1424, "1.4KiB"},
+		{152310, "148.7KiB"},
+		{1024 * 1190, "1.2MiB"},
+		{(math.Pow(1024, 5) * 3) + (math.Pow(1024, 4) * 400), "3.4PiB"},
+		{(math.Pow(1024, 6) * 3) + (math.Pow(1024, 5) * 400), "3472.0PiB"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := Byte(tc.in).String()
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
