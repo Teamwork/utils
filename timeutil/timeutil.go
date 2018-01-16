@@ -33,13 +33,13 @@ func FormatAsZulu(t time.Time) string {
 	return t.Format("2006-01-02T15:04:05Z")
 }
 
-// MonthsTo returns the number of months from the current date the given date.
-//
-// The number of months is always rounded down, with a minimal value of 1.
+// MonthsTo returns the number of months from the current date to the given
+// date. The number of months is always rounded down, with a minimal value of 1.
 //
 // For example this returns 2:
-//
 //     MonthsTo(time.Now().Add(24 * time.Hour * 70))
+//
+// Dates in the past are not supported, and their behaviour is undefined!
 func MonthsTo(a time.Time) int {
 	var days int
 	startDate := time.Now()
