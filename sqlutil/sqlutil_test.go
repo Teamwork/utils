@@ -13,7 +13,7 @@ func TestIntListValue(t *testing.T) {
 		in   IntList
 		want string
 	}{
-		{*new(IntList), ""},
+		{IntList{}, ""},
 		{IntList{}, ""},
 		{IntList{4, 5}, "4, 5"},
 		{IntList{1, 1}, "1, 1"},
@@ -40,7 +40,7 @@ func TestIntListScan(t *testing.T) {
 		want    IntList
 		wantErr string
 	}{
-		{"", *new(IntList), ""},
+		{"", IntList{}, ""},
 		{"1", IntList{1}, ""},
 		{"4, 5", IntList{4, 5}, ""},
 		{"4,   5", IntList{4, 5}, ""},
@@ -73,7 +73,7 @@ func TestStringListValue(t *testing.T) {
 		in   StringList
 		want string
 	}{
-		{*new(StringList), ""},
+		{StringList{}, ""},
 		{StringList{}, ""},
 		{StringList{"4", "5"}, "4,5"},
 		{StringList{"1", "1"}, "1,1"},
@@ -101,7 +101,7 @@ func TestStringListScan(t *testing.T) {
 		want    StringList
 		wantErr string
 	}{
-		{"", *new(StringList), ""},
+		{"", StringList{}, ""},
 		{"1", StringList{"1"}, ""},
 		{"4, 5", StringList{"4", "5"}, ""},
 		{"1, 1", StringList{"1", "1"}, ""},
