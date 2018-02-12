@@ -26,7 +26,7 @@ func (l *IntList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
 	}
-	var ints []int64
+	ints := []int64{}
 	for _, i := range strings.Split(fmt.Sprintf("%s", v), ",") {
 		i = strings.TrimSpace(i)
 		if i == "" {
@@ -62,7 +62,7 @@ func (l *StringList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
 	}
-	var strs []string
+	strs := []string{}
 	for _, s := range strings.Split(fmt.Sprintf("%s", v), ",") {
 		s = strings.TrimSpace(s)
 		if s == "" {
