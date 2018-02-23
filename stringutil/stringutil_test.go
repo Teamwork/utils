@@ -28,3 +28,30 @@ func TestLeft(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveUnprintable(t *testing.T) {
+	cases := []struct {
+		in      string
+		lenLost int
+		want    string
+	}{
+		{"Hello, 世界", 0, "Hello, 世界"},
+		{"m", 1, "m"},
+		{"m", 0, "m"},
+		{" ", 3, " "},
+		{"a‎b‏c", 6, "abc"}, // only 2 removed but count as 3 each
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := RemoveUnprintable(tc.in)
+			charsRemoved := len(tc.in) - len(out)
+			if tc.lenLost != charsRemoved {
+				t.Errorf("\ncharsRemoved:  %#v\nwant: %#v\n", charsRemoved, tc.lenLost)
+			}
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
