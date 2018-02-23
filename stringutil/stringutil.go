@@ -1,5 +1,5 @@
 // Package stringutil adds functions for working with strings.
-package stringutil
+package stringutil // import "github.com/teamwork/stringutil"
 
 import "regexp"
 
