@@ -17,11 +17,9 @@ func Left(s string, n int) string {
 	return s[:n] + "…"
 }
 
+var reUnprintable = regexp.MustCompile("[\x00-\x1F\u200e\u200f]")
+
 // RemoveUnprintable removes unprintable characters (0 to 31 ASCII) from a string.
-func RemoveUnprintable(s string) (string, error) {
-	r, err := regexp.Compile("[\x00-\x1F]|[\u200e-\u200f]")
-	if err != nil {
-		return s, err
-	}
-	return r.ReplaceAllString(s, ""), nil
+func RemoveUnprintable(s string) string {
+	return reUnprintable.ReplaceAllString(s, "")
 }

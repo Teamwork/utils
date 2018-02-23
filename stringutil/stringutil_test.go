@@ -44,10 +44,7 @@ func TestRemoveUnprintable(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out, err := RemoveUnprintable(tc.in)
-			if err != nil {
-				t.Error(err)
-			}
+			out := RemoveUnprintable(tc.in)
 			charsRemoved := len(tc.in) - len(out)
 			if tc.lenLost != charsRemoved {
 				t.Errorf("\ncharsRemoved:  %#v\nwant: %#v\n", charsRemoved, tc.lenLost)
