@@ -39,6 +39,7 @@ func TestRemoveUnprintable(t *testing.T) {
 		{"m", 1, "m"},
 		{"m", 0, "m"},
 		{" ", 3, " "},
+		{"a‎b‏c", 6, "abc"}, // only 2 removed but count as 3 each
 	}
 
 	for i, tc := range cases {

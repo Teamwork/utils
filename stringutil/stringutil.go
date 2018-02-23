@@ -19,7 +19,7 @@ func Left(s string, n int) string {
 
 // RemoveUnprintable removes unprintable characters (0 to 31 ASCII) from a string.
 func RemoveUnprintable(s string) (string, error) {
-	r, err := regexp.Compile("[\x00-\x1F]")
+	r, err := regexp.Compile("[\x00-\x1F]|[\u200e-\u200f]")
 	if err != nil {
 		return s, err
 	}
