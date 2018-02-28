@@ -2,6 +2,7 @@ package stringutil
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -53,5 +54,35 @@ func TestRemoveUnprintable(t *testing.T) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
 		})
+	}
+}
+
+func TestGetLine(t *testing.T) {
+	cases := []struct {
+		in   string
+		line int
+		want string
+	}{
+		{"Hello", 1, "Hello"},
+		{"Hello", 2, ""},
+		{"Hello\nworld", 1, "Hello"},
+		{"Hello\nworld", 2, "world"},
+		{"Hello\nworld", 3, ""},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := GetLine(tc.in, tc.line)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func BenchmarkRemoveUnprintable(b *testing.B) {
+	text := strings.Repeat("Hello, world, it's a sentences!\n", 20000)
+	for n := 0; n < b.N; n++ {
+		GetLine(text, 200)
 	}
 }
