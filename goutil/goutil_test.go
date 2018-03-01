@@ -3,6 +3,7 @@ package goutil
 import (
 	"fmt"
 	"go/build"
+	"go/token"
 	"reflect"
 	"sort"
 	"testing"
@@ -120,5 +121,32 @@ func TestExpand(t *testing.T) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", outPkgs, tc.want)
 			}
 		})
+	}
+}
+
+func TestParseFiles(t *testing.T) {
+	pkg, err := ResolvePackage("net/http", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fset := token.NewFileSet()
+	out, err := ParseFiles(fset, pkg.Dir, pkg.GoFiles, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(out) != 1 {
+		t.Fatalf("len(out) == %v", len(out))
+	}
+
+	for _, pkg := range out {
+		if pkg.Name != "http" {
+			t.Errorf("name == %v", pkg.Name)
+		}
+
+		if len(pkg.Files) < 10 {
+			t.Errorf("len(pkg.Files) == %v", len(pkg.Files))
+		}
 	}
 }

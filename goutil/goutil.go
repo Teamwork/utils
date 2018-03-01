@@ -3,7 +3,10 @@ package goutil // import "github.com/teamwork/utils/goutil"
 
 import (
 	"errors"
+	"go/ast"
 	"go/build"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"sort"
@@ -112,4 +115,45 @@ func ResolveWildcard(path string, mode build.ImportMode) ([]*build.Package, erro
 	}
 
 	return out, nil
+}
+
+// ParseFiles parses the given list of *.go files.
+//
+// The advantage of this over parser.ParseDir() is that you can use the result
+// of ResolvePackage() as input, which avoids a directory scan and takes build
+// tags in to account (ParseDir() ignores any build tags).
+func ParseFiles(
+	fset *token.FileSet,
+	dir string,
+	files []string,
+	mode parser.Mode,
+) (map[string]*ast.Package, error) {
+
+	pkgs := make(map[string]*ast.Package)
+	var firstErr error
+
+	for _, file := range files {
+		path := filepath.Join(dir, "/", file)
+
+		src, err := parser.ParseFile(fset, path, nil, mode)
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+
+		name := src.Name.Name
+		pkg, found := pkgs[name]
+		if !found {
+			pkg = &ast.Package{
+				Name:  name,
+				Files: make(map[string]*ast.File),
+			}
+			pkgs[name] = pkg
+		}
+		pkg.Files[path] = src
+	}
+
+	return pkgs, firstErr
 }
