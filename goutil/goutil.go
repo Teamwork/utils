@@ -19,12 +19,12 @@ import (
 //
 // The packages will be sorted with duplicate packages removed. The /vendor/
 // directory is automatically ignored.
-func Expand(paths []string) ([]*build.Package, error) {
+func Expand(paths []string, mode build.ImportMode) ([]*build.Package, error) {
 	var out []*build.Package
 	seen := make(map[string]struct{})
 	for _, p := range paths {
 		if strings.HasSuffix(p, "/...") {
-			subPkgs, err := ResolveWildcard(p)
+			subPkgs, err := ResolveWildcard(p, mode)
 			if err != nil {
 				return nil, err
 			}
@@ -37,7 +37,7 @@ func Expand(paths []string) ([]*build.Package, error) {
 			continue
 		}
 
-		pkg, err := ResolvePackage(p)
+		pkg, err := ResolvePackage(p, mode)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func Expand(paths []string) ([]*build.Package, error) {
 // ResolvePackage resolves a package path, which can either be a local directory
 // relative to the current dir (e.g. "./example"), a full path (e.g.
 // ~/go/src/example"), or a package path (e.g. "example").
-func ResolvePackage(path string) (pkg *build.Package, err error) {
+func ResolvePackage(path string, mode build.ImportMode) (pkg *build.Package, err error) {
 	if len(path) == 0 {
 		// TODO: maybe resolve like '.'? Dunno what makes more sense.
 		return nil, errors.New("cannot resolve empty string")
@@ -63,15 +63,15 @@ func ResolvePackage(path string) (pkg *build.Package, err error) {
 
 	switch path[0] {
 	case '/':
-		pkg, err = build.ImportDir(path, build.FindOnly)
+		pkg, err = build.ImportDir(path, mode)
 	case '.':
 		path, err = filepath.Abs(path)
 		if err != nil {
 			return nil, err
 		}
-		pkg, err = build.ImportDir(path, build.FindOnly)
+		pkg, err = build.ImportDir(path, mode)
 	default:
-		pkg, err = build.Import(path, ".", build.FindOnly)
+		pkg, err = build.Import(path, ".", mode)
 	}
 	if err != nil {
 		return nil, err
@@ -82,8 +82,8 @@ func ResolvePackage(path string) (pkg *build.Package, err error) {
 
 // ResolveWildcard finds all subpackages in the "example/..." format. The
 // "/vendor/" directory will be ignored.
-func ResolveWildcard(path string) ([]*build.Package, error) {
-	root, err := ResolvePackage(path[:len(path)-4])
+func ResolveWildcard(path string, mode build.ImportMode) ([]*build.Package, error) {
+	root, err := ResolvePackage(path[:len(path)-4], mode)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func ResolveWildcard(path string) ([]*build.Package, error) {
 
 	var out []*build.Package
 	for d := range goDirs {
-		pkg, err := ResolvePackage(d)
+		pkg, err := ResolvePackage(d, mode)
 		if err != nil {
 			return nil, err
 		}

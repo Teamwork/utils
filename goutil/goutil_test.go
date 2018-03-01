@@ -2,6 +2,7 @@ package goutil
 
 import (
 	"fmt"
+	"go/build"
 	"reflect"
 	"sort"
 	"testing"
@@ -104,7 +105,7 @@ func TestExpand(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out, err := Expand(tc.in)
+			out, err := Expand(tc.in, build.FindOnly)
 			if !test.ErrorContains(err, tc.wantErr) {
 				t.Fatal(err)
 			}
