@@ -150,3 +150,57 @@ func TestParseFiles(t *testing.T) {
 		}
 	}
 }
+
+func TestResolveImport(t *testing.T) {
+	cases := []struct {
+		inFile, inPkg, want, wantErr string
+	}{
+		// Twice to test it works from cache
+		{"package main\nimport \"net/http\"\n", "http", "net/http", ""},
+		{"package main\nimport \"os\"\n", "os", "os", ""},
+		{"package main\nimport xxx \"net/http\"\n", "xxx", "net/http", ""},
+		{"package main\nimport \"net/http\"\n", "httpx", "", ""},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			f, clean := test.TempFile(t, tc.inFile)
+			defer clean()
+
+			out, err := ResolveImport(f, tc.inPkg)
+			if !test.ErrorContains(err, tc.wantErr) {
+				t.Fatalf("wrong err: %v", err)
+			}
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+
+	t.Run("cache", func(t *testing.T) {
+		f, clean := test.TempFile(t, "package main\nimport \"net/http\"\n")
+		defer clean()
+
+		importsCache = make(map[string]map[string]string)
+		out, err := ResolveImport(f, "http")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if out != "net/http" {
+			t.Fatalf("out wrong: %v", out)
+		}
+
+		// Second time
+		out, err = ResolveImport(f, "http")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if out != "net/http" {
+			t.Fatalf("out wrong: %v", out)
+		}
+
+		if len(importsCache) != 1 {
+			t.Error(importsCache)
+		}
+	})
+}

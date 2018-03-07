@@ -8,6 +8,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -156,4 +157,40 @@ func ParseFiles(
 	}
 
 	return pkgs, firstErr
+}
+
+var importsCache = make(map[string]map[string]string)
+
+// ResolveImport resolves an import name (e.g. "models") to the full imported
+// package (e.g. "github.com/teamwork/desk/models") for a file. An empty string
+// is returned if the package can't be resolved.
+//
+// This will automatically keep a cache with name -> packagePath mappings to
+// avoid having to parse the file more than once.
+func ResolveImport(file, pkgName string) (string, error) {
+	imports, ok := importsCache[file]
+	if !ok {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, file, nil, parser.ImportsOnly)
+		if err != nil {
+			return "", err
+		}
+
+		imports = make(map[string]string)
+		for _, imp := range f.Imports {
+			var base string
+			p := strings.Trim(imp.Path.Value, `"`)
+			if imp.Name != nil {
+				base = imp.Name.Name
+			} else {
+				base = path.Base(p)
+			}
+
+			imports[base] = p
+		}
+
+		importsCache[file] = imports
+	}
+
+	return imports[pkgName], nil
 }
