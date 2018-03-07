@@ -22,8 +22,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/teamwork/test"
-  packages = [".","diff"]
-  revision = "109d4a7e538bd68fe61aadbeac95ef36d59a72b1"
+  packages = [
+    ".",
+    "diff"
+  ]
+  revision = "dc1dac931dfa18952f340dcf12d5fb0bea92e8c6"
 
 [solve-meta]
   analyzer-name = "dep"
