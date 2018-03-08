@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# Generated from https://github.com/Teamwork/skel-go
+# DO NOT EDIT DIRECTLY!
 
 usage="Setup the environment for Travis"
 
