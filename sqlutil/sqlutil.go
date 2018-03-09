@@ -141,11 +141,7 @@ func (b *Bool) Value() (driver.Value, error) {
 		return nil, fmt.Errorf("boolean not initialized")
 	}
 
-	if *b {
-		return int64(1), nil
-	}
-
-	return int64(0), nil
+	return bool(*b), nil
 }
 
 // MarshalText converts the bool to a human readable representation, that is

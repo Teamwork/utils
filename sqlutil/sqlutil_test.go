@@ -170,8 +170,8 @@ func TestBoolScanValue(t *testing.T) {
 		in   Bool
 		want driver.Value
 	}{
-		{false, int64(0)},
-		{true, int64(1)},
+		{false, false},
+		{true, true},
 	}
 
 	for _, tc := range cases {
