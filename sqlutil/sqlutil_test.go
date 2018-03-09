@@ -218,12 +218,12 @@ func TestBoolUnmarshalText(t *testing.T) {
 		want    Bool
 		wantErr string
 	}{
-		{[]byte("true"), true, ""},
-		{[]byte(`"true"`), true, ""},
-		{[]byte(`1`), true, ""},
-		{[]byte("false"), false, ""},
-		{[]byte(`"false"`), false, ""},
-		{[]byte(`0`), false, ""},
+		{[]byte("  true  "), true, ""},
+		{[]byte(` "true"`), true, ""},
+		{[]byte(`  1 `), true, ""},
+		{[]byte("false  "), false, ""},
+		{[]byte(`"false" `), false, ""},
+		{[]byte(` 0 `), false, ""},
 		{[]byte(`not a valid bool`), false, "invalid value 'not a valid bool'"},
 	}
 
