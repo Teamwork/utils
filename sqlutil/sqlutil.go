@@ -137,22 +137,14 @@ func (b *Bool) Scan(src interface{}) error {
 }
 
 // Value converts a bool type into a number to persist it in the database.
-func (b *Bool) Value() (driver.Value, error) {
-	if b == nil {
-		return nil, fmt.Errorf("boolean not initialized")
-	}
-
-	return bool(*b), nil
+func (b Bool) Value() (driver.Value, error) {
+	return bool(b), nil
 }
 
 // MarshalText converts the bool to a human readable representation, that is
 // also compatible with the JSON format.
-func (b *Bool) MarshalText() ([]byte, error) {
-	if b == nil {
-		return nil, fmt.Errorf("boolean not initialized")
-	}
-
-	if *b {
+func (b Bool) MarshalText() ([]byte, error) {
+	if b {
 		return []byte("true"), nil
 	}
 
