@@ -96,6 +96,7 @@ func (b *Bool) Scan(src interface{}) error {
 		var text string
 
 		if raw, ok := v.([]byte); ok {
+			// handle the bit(1) column type
 			if len(raw) == 1 {
 				if raw[0] == 0x1 {
 					*b = true
