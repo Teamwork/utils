@@ -11,3 +11,11 @@ func MustMarshal(v interface{}) []byte {
 	}
 	return b
 }
+
+// MustUnmarshal behaves like json.Unmarshal but will panic on errors.
+func MustUnmarshal(data []byte, v interface{}) {
+	err := json.Unmarshal(data, v)
+	if err != nil {
+		panic(err)
+	}
+}

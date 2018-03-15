@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestMustMarshal(t *testing.T) {
@@ -22,4 +23,31 @@ func TestMustMarshal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMustUnmarshal(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		var out struct {
+			Hello string `json:"hello"`
+		}
+		MustUnmarshal([]byte(`{"hello":"world"}`), &out)
+		if out.Hello != "world" {
+			t.Errorf("%#v", out)
+		}
+	})
+
+	t.Run("panic", func(t *testing.T) {
+		defer func() {
+			rec := recover()
+			if rec == nil {
+				t.Errorf("no panic?")
+			}
+		}()
+
+		var out struct {
+			Hello time.Time `json:"hello"`
+		}
+		MustUnmarshal([]byte(`{"hello":"world"}`), &out)
+	})
+
 }
