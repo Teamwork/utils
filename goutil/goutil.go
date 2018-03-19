@@ -56,6 +56,8 @@ func Expand(paths []string, mode build.ImportMode) ([]*build.Package, error) {
 	return out, nil
 }
 
+var cwd string
+
 // ResolvePackage resolves a package path, which can either be a local directory
 // relative to the current dir (e.g. "./example"), a full path (e.g.
 // ~/go/src/example"), or a package path (e.g. "example").
@@ -75,7 +77,13 @@ func ResolvePackage(path string, mode build.ImportMode) (pkg *build.Package, err
 		}
 		pkg, err = build.ImportDir(path, mode)
 	default:
-		pkg, err = build.Import(path, ".", mode)
+		if cwd == "" {
+			cwd, err = os.Getwd()
+			if err != nil {
+				return nil, err
+			}
+		}
+		pkg, err = build.Import(path, cwd, mode)
 	}
 	if err != nil {
 		return nil, err

@@ -151,7 +151,7 @@ func TestParseFiles(t *testing.T) {
 	}
 }
 
-func TestResolveImport(t *testing.T) {
+func TestResolvePackage(t *testing.T) {
 	cases := []struct {
 		inFile, inPkg, want, wantErr string
 	}{
@@ -160,6 +160,9 @@ func TestResolveImport(t *testing.T) {
 		{"package main\nimport \"os\"\n", "os", "os", ""},
 		{"package main\nimport xxx \"net/http\"\n", "xxx", "net/http", ""},
 		{"package main\nimport \"net/http\"\n", "httpx", "", ""},
+
+		// Make sure it works from vendor
+		{"package main\n import \"github.com/teamwork/test\"\n", "test", "github.com/teamwork/test", ""},
 	}
 
 	for i, tc := range cases {
