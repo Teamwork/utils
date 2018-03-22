@@ -2,6 +2,7 @@ package goutil
 
 import (
 	"fmt"
+	"go/ast"
 	"go/build"
 	"go/token"
 	"reflect"
@@ -204,6 +205,45 @@ func TestResolvePackage(t *testing.T) {
 
 		if len(importsCache) != 1 {
 			t.Error(importsCache)
+		}
+	})
+}
+
+func TestTagName(t *testing.T) {
+	cases := []struct {
+		in, inName, want string
+	}{
+		{`json:"w00t"`, "json", "w00t"},
+		{`yaml:"w00t"`, "json", "Original"},
+		{`json:"w00t" yaml:"xxx""`, "yaml", "xxx"},
+		{`JSON:"w00t"`, "json", "Original"},
+		{`JSON: "w00t"`, "json", "Original"},
+		{`json:"w00t,omitempty"`, "json", "w00t"},
+		{`json:"w00t,"`, "json", "w00t"},
+		{`json:"-"`, "json", "-"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			f := &ast.Field{
+				Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
+				Tag:   &ast.BasicLit{Value: fmt.Sprintf("`%v`", tc.in)}}
+
+			out := TagName(f, tc.inName)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+
+	t.Run("nil", func(t *testing.T) {
+		f := &ast.Field{
+			Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
+		}
+
+		out := TagName(f, "json")
+		if out != "Original" {
+			t.Errorf("\nout:  %#v\nwant: %#v\n", out, "Original")
 		}
 	})
 }
