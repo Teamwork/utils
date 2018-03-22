@@ -246,4 +246,21 @@ func TestTagName(t *testing.T) {
 			t.Errorf("\nout:  %#v\nwant: %#v\n", out, "Original")
 		}
 	})
+
+	t.Run("nil", func(t *testing.T) {
+		defer func() {
+			r := recover()
+			if r == nil {
+				t.Fatal("didn't panic")
+			}
+			if r.(string) != "cannot use TagName on struct with more than one name" {
+				t.Errorf("wrong message: %#v", r)
+			}
+		}()
+
+		f := &ast.Field{
+			Names: []*ast.Ident{&ast.Ident{Name: "Original"},
+				&ast.Ident{Name: "Second"}}}
+		_ = TagName(f, "json")
+	})
 }
