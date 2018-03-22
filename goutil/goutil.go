@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 )
@@ -201,4 +202,33 @@ func ResolveImport(file, pkgName string) (string, error) {
 	}
 
 	return imports[pkgName], nil
+}
+
+// TagName gets the tag name for a struct field any attributes (like omitempty)
+// removed. It will return the struct field name if there is no tag.
+//
+// This function does not do any validation on the tag format. Use "go vet"!
+func TagName(f *ast.Field, n string) string {
+	// For e.g.:
+	//  A, B string `json:"x"`
+	//
+	// Most (all?) marshallers and such will simply skip this anyway as
+	// duplicate keys usually doesn't make too much sense.
+	if len(f.Names) != 1 {
+		panic("cannot use TagName on struct with more than one name")
+	}
+
+	if f.Tag == nil {
+		return f.Names[0].Name
+	}
+
+	tag := reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get(n)
+	if tag == "" {
+		return f.Names[0].Name
+	}
+
+	if p := strings.Index(tag, ","); p != -1 {
+		return tag[:p]
+	}
+	return tag
 }
