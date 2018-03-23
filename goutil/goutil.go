@@ -3,6 +3,7 @@ package goutil // import "github.com/teamwork/utils/goutil"
 
 import (
 	"errors"
+	"fmt"
 	"go/ast"
 	"go/build"
 	"go/parser"
@@ -214,16 +215,23 @@ func TagName(f *ast.Field, n string) string {
 	//
 	// Most (all?) marshallers and such will simply skip this anyway as
 	// duplicate keys usually doesn't make too much sense.
-	if len(f.Names) != 1 {
-		panic("cannot use TagName on struct with more than one name")
+	if len(f.Names) > 1 {
+		panic(fmt.Sprintf("cannot use TagName on struct with more than one name: %v",
+			f.Names))
 	}
 
 	if f.Tag == nil {
+		if len(f.Names) == 0 {
+			return getEmbedName(f.Type)
+		}
 		return f.Names[0].Name
 	}
 
 	tag := reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get(n)
 	if tag == "" {
+		if len(f.Names) == 0 {
+			return getEmbedName(f.Type)
+		}
 		return f.Names[0].Name
 	}
 
@@ -231,4 +239,21 @@ func TagName(f *ast.Field, n string) string {
 		return tag[:p]
 	}
 	return tag
+}
+
+// Embedded struct:
+//  Foo `json:"foo"`
+func getEmbedName(f ast.Expr) string {
+start:
+	switch t := f.(type) {
+	case *ast.StarExpr:
+		f = t.X
+		goto start
+	case *ast.Ident:
+		return t.Name
+	case *ast.SelectorExpr:
+		return t.Sel.Name
+	default:
+		panic(fmt.Sprintf("can't get name for %#v", f))
+	}
 }

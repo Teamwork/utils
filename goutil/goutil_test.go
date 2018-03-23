@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"reflect"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/teamwork/test"
@@ -253,7 +254,7 @@ func TestTagName(t *testing.T) {
 			if r == nil {
 				t.Fatal("didn't panic")
 			}
-			if r.(string) != "cannot use TagName on struct with more than one name" {
+			if !strings.HasPrefix(r.(string), "cannot use TagName on struct with more than one name: ") {
 				t.Errorf("wrong message: %#v", r)
 			}
 		}()
