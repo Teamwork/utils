@@ -264,4 +264,55 @@ func TestTagName(t *testing.T) {
 				&ast.Ident{Name: "Second"}}}
 		_ = TagName(f, "json")
 	})
+
+	t.Run("embed", func(t *testing.T) {
+		cases := []struct {
+			name string
+			in   *ast.Field
+			want string
+		}{
+			{
+				"notag",
+				&ast.Field{
+					Tag:  &ast.BasicLit{Value: "`b:\"Bar\"`"},
+					Type: &ast.Ident{Name: "Foo"},
+				},
+				"Foo",
+			},
+			{
+				"ident",
+				&ast.Field{Type: &ast.Ident{Name: "Foo"}},
+				"Foo",
+			},
+			{
+				"pointer",
+				&ast.Field{Type: &ast.StarExpr{X: &ast.Ident{Name: "Foo"}}},
+				"Foo",
+			},
+			{
+				"pkg",
+				&ast.Field{Type: &ast.SelectorExpr{Sel: &ast.Ident{Name: "Foo"}}},
+				"Foo",
+			},
+			{
+				"pkg-pointer",
+				&ast.Field{
+					Type: &ast.StarExpr{
+						X: &ast.SelectorExpr{Sel: &ast.Ident{Name: "Foo"}},
+					},
+				},
+				"Foo",
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				out := TagName(tc.in, "a")
+				if out != tc.want {
+					t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+				}
+			})
+		}
+
+	})
 }
