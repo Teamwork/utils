@@ -18,6 +18,8 @@ func TestLeft(t *testing.T) {
 		{"Hello", 4, "Hell…"},
 		{"Hello", 0, "…"},
 		{"Hello", -2, "…"},
+		{"汉语漢語", 1, "汉…"},
+		{"汉语漢語", 3, "汉语漢…"},
 	}
 
 	for i, tc := range cases {
@@ -77,6 +79,13 @@ func TestGetLine(t *testing.T) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
 		})
+	}
+}
+
+func BenchmarkLeft(b *testing.B) {
+	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
+	for n := 0; n < b.N; n++ {
+		Left(text, 250)
 	}
 }
 
