@@ -17,7 +17,19 @@ func Left(s string, n int) string {
 	if len(s) <= n {
 		return s
 	}
-	return s[:n] + "…"
+
+	var (
+		chari int
+		bytei int
+	)
+	for bytei = range s {
+		if chari >= n {
+			break
+		}
+		chari++
+	}
+
+	return s[:bytei] + "…"
 }
 
 var reUnprintable = regexp.MustCompile("[\x00-\x1F\u200e\u200f]")
