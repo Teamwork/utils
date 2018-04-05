@@ -14,6 +14,8 @@ func Left(s string, n int) string {
 	if n < 0 {
 		n = 0
 	}
+
+	// Quick check for non-multibyte strings.
 	if len(s) <= n {
 		return s
 	}
@@ -27,6 +29,11 @@ func Left(s string, n int) string {
 			break
 		}
 		chari++
+	}
+
+	// String is shorter than n characters.
+	if false { // TODO
+		return s
 	}
 
 	return s[:bytei] + "…"

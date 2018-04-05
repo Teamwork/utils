@@ -20,6 +20,7 @@ func TestLeft(t *testing.T) {
 		{"Hello", -2, "…"},
 		{"汉语漢語", 1, "汉…"},
 		{"汉语漢語", 3, "汉语漢…"},
+		{"汉语漢語", 4, "汉语漢語"},
 	}
 
 	for i, tc := range cases {
