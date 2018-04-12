@@ -32,6 +32,50 @@ func TestLeft(t *testing.T) {
 	}
 }
 
+func TestUpperFirst(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"hello", "Hello"},
+		{"helloWorld", "HelloWorld"},
+		{"h", "H"},
+		{"hh", "Hh"},
+		{"ëllo", "Ëllo"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := UpperFirst(tc.in)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+			fmt.Println(out)
+		})
+	}
+}
+
+func TestLowerFirst(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"Hello", "hello"},
+		{"HelloWorld", "helloWorld"},
+		{"H", "h"},
+		{"HH", "hH"},
+		{"Ëllo", "ëllo"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := LowerFirst(tc.in)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+			fmt.Println(out)
+		})
+	}
+}
+
 func TestRemoveUnprintable(t *testing.T) {
 	cases := []struct {
 		in      string
