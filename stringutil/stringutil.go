@@ -32,6 +32,32 @@ func Left(s string, n int) string {
 	return s[:bytei] + "…"
 }
 
+// UpperFirst transforms the first character to upper case, leaving the rest of
+// the casing alone.
+func UpperFirst(s string) string {
+	if len(s) < 2 {
+		return strings.ToUpper(s)
+	}
+	for _, c := range s {
+		sc := string(c)
+		return strings.ToUpper(sc) + s[len(sc):]
+	}
+	return ""
+}
+
+// LowerFirst transforms the first character to lower case, leaving the rest of
+// the casing alone.
+func LowerFirst(s string) string {
+	if len(s) < 2 {
+		return strings.ToLower(s)
+	}
+	for _, c := range s {
+		sc := string(c)
+		return strings.ToLower(sc) + s[len(sc):]
+	}
+	return ""
+}
+
 var reUnprintable = regexp.MustCompile("[\x00-\x1F\u200e\u200f]")
 
 // RemoveUnprintable removes unprintable characters (0 to 31 ASCII) from a string.
