@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"unicode"
 )
 
 // Constants for DispositionArgs.
@@ -53,15 +54,16 @@ func SetContentDisposition(header http.Header, args DispositionArgs) error {
 		r := strings.NewReplacer("\\", "", "%", "", `"`, `\"`)
 		args.Filename = r.Replace(args.Filename)
 
-		// Don't allow unicode.
-		ascii, hasUni := hasUnicode(args.Filename)
+		// Don't allow unicode in the "filename" attribute; instead, add that to
+		// the filename* one.
+		filename, ascii, hasUni := formatFilename(args.Filename)
 		v += fmt.Sprintf(`; filename="%v"`, ascii)
 
 		// Add filename* for unicode, encoded according to
 		// https://tools.ietf.org/html/rfc5987
 		if hasUni {
 			v += fmt.Sprintf("; filename*=UTF-8''%v",
-				url.QueryEscape(args.Filename))
+				url.QueryEscape(filename))
 		}
 	}
 
@@ -69,20 +71,28 @@ func SetContentDisposition(header http.Header, args DispositionArgs) error {
 	return nil
 }
 
-func hasUnicode(s string) (string, bool) {
-	deuni := make([]rune, len(s))
+func formatFilename(s string) (string, string, bool) {
+	uni := make([]rune, len(s))
+	ascii := make([]rune, len(s))
 	has := false
-	i := 0
+	asciiIdx := 0
+	uniIdx := 0
 	for _, c := range s {
-		// TODO: maybe also disallow any escape chars?
+		if unicode.IsControl(c) {
+			continue
+		}
+
 		switch {
 		case c > 255:
 			has = true
 		default:
-			deuni[i] = c
-			i++
+			ascii[asciiIdx] = c
+			asciiIdx++
 		}
+
+		uni[uniIdx] = c
+		uniIdx++
 	}
 
-	return strings.TrimRight(string(deuni), "\x00"), has
+	return strings.TrimRight(string(uni), "\x00"), strings.TrimRight(string(ascii), "\x00"), has
 }
