@@ -4,6 +4,7 @@ package sqlutil // import "github.com/teamwork/utils/sqlutil"
 import (
 	"database/sql/driver"
 	"fmt"
+	"html/template"
 	"strconv"
 	"strings"
 
@@ -175,5 +176,19 @@ func (b *Bool) UnmarshalText(text []byte) error {
 		return fmt.Errorf("invalid value '%s'", normalized)
 	}
 
+	return nil
+}
+
+// HTML is a string which indicates that the string has been HTML-escaped.
+type HTML template.HTML
+
+// Value implements the SQL Value function to determine what to store in the DB.
+func (h HTML) Value() (driver.Value, error) {
+	return string(h), nil
+}
+
+// Scan converts the data returned from the DB into the struct.
+func (h *HTML) Scan(v interface{}) error {
+	*h = HTML(v.([]byte))
 	return nil
 }
