@@ -28,6 +28,10 @@ func TestSetContentDisposition(t *testing.T) {
 			`inline; filename="hello, \"world\".pdf/20"`, ""},
 		{DispositionArgs{Type: TypeInline, Filename: `h€llo.pdf`},
 			`inline; filename="hllo.pdf"; filename*=UTF-8''h%E2%82%ACllo.pdf`, ""},
+		{DispositionArgs{Type: TypeInline, Filename: "h\x10llo.pdf"},
+			`inline; filename="hllo.pdf"`, ""},
+		{DispositionArgs{Type: TypeInline, Filename: "h€\x10llo.pdf"},
+			`inline; filename="hllo.pdf"; filename*=UTF-8''h%E2%82%ACllo.pdf`, ""},
 	}
 
 	for i, tc := range cases {
