@@ -152,7 +152,7 @@ func TestParseFiles(t *testing.T) {
 	}
 }
 
-func TestResolvePackage(t *testing.T) {
+func TestResolveImport(t *testing.T) {
 	cases := []struct {
 		inFile, inPkg, want, wantErr string
 	}{

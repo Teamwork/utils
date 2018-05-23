@@ -202,7 +202,15 @@ func ResolveImport(file, pkgName string) (string, error) {
 		importsCache[file] = imports
 	}
 
-	return imports[pkgName], nil
+	r, ok := imports[pkgName]
+	if !ok {
+		currentPkg := path.Base(path.Dir(file))
+		fmt.Println(file)
+		if pkgName == currentPkg {
+			r = "."
+		}
+	}
+	return r, nil
 }
 
 // TagName gets the tag name for a struct field any attributes (like omitempty)
