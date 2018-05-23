@@ -205,7 +205,6 @@ func ResolveImport(file, pkgName string) (string, error) {
 	r, ok := imports[pkgName]
 	if !ok {
 		currentPkg := path.Base(path.Dir(file))
-		fmt.Println(file)
 		if pkgName == currentPkg {
 			r = "."
 		}
