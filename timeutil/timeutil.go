@@ -25,6 +25,24 @@ func EndOfMonth(date time.Time) time.Time {
 	return time.Date(date.Year(), date.Month()+1, 0, 0, 0, 0, 0, date.Location())
 }
 
+// StartOfWeek returns the first day of the week of date. It assumes that Monday
+// is the beginning of the week.
+func StartOfWeek(date time.Time) time.Time {
+	for date.Weekday() != time.Monday {
+		date = date.AddDate(0, 0, -1)
+	}
+	return date
+}
+
+// EndOfWeek returns the last day of the week of date. It assumes that Sunday is
+// the end of the week.
+func EndOfWeek(date time.Time) time.Time {
+	for date.Weekday() != time.Sunday {
+		date = date.AddDate(0, 0, 1)
+	}
+	return date
+}
+
 // FormatAsZulu gets a ISO 8601 formatted date. The date is assumed to be in
 // UTC ("Zulu time").
 //
