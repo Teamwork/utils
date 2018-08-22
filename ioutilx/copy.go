@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -220,13 +219,9 @@ func CopyMode(src, dst string, modes Modes) error {
 	}
 
 	if modes.Owner {
-		statT, ok := srcStat.Sys().(*syscall.Stat_t)
-		if !ok {
-			return errors.New("could not get file owner: type assertion to syscall.Stat_t failed")
-		}
-		err := os.Chown(dst, int(statT.Uid), int(statT.Gid))
+		err := setOwner(srcStat, dst)
 		if err != nil {
-			return errors.Wrap(err, "could not chown")
+			return err
 		}
 	}
 
