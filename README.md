@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/Teamwork/utils.svg?branch=master)](https://travis-ci.org/Teamwork/utils)
 [![codecov](https://codecov.io/gh/Teamwork/utils/branch/master/graph/badge.svg?token=n0k8YjbQOL)](https://codecov.io/gh/Teamwork/utils)
-[![GoDoc](https://godoc.org/github.com/Teamwork/utils?status.svg)](http://teamwork.github.io/utils/)
+[![GoDoc](https://godoc.org/github.com/Teamwork/utils?status.svg)](https://godoc.org/github.com/Teamwork/utils)
 
 `utils` is a collection of small – and sometimes not so small – extensions to
 Go's standard library. There are no external dependencies.
