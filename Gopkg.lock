@@ -2,35 +2,47 @@
 
 
 [[projects]]
+  digest = "1:56c130d885a4aacae1dd9c7b71cfe39912c7ebc1ff7d2b46083c8812996dc43b"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = ""
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:7365acd48986e205ccb8652cc746f09c8b7876030d53710ea6ef7d0bd0dcd7ca"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = ""
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = ""
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:c881d21e0d93b374cc68d558b58c9e290e43989bb00db7540f131b53ff2fbfa4"
   name = "github.com/teamwork/test"
   packages = [
     ".",
-    "diff"
+    "diff",
   ]
+  pruneopts = ""
   revision = "dc1dac931dfa18952f340dcf12d5fb0bea92e8c6"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c752fffc01da24aae4860663328df82922310e4aaf00a9932f21dda9dfd44c3b"
+  input-imports = [
+    "github.com/pkg/errors",
+    "github.com/teamwork/test",
+    "github.com/teamwork/test/diff",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
