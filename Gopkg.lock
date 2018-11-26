@@ -27,14 +27,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c881d21e0d93b374cc68d558b58c9e290e43989bb00db7540f131b53ff2fbfa4"
+  digest = "1:792dd612777789f397b2ed9d5b7d48594c60160a5ccd83e304cb8641e2cf3ea0"
   name = "github.com/teamwork/test"
   packages = [
     ".",
     "diff",
   ]
   pruneopts = ""
-  revision = "dc1dac931dfa18952f340dcf12d5fb0bea92e8c6"
+  revision = "dc090c22ecc80adc5efde11febc63ea1ddfdac0c"
 
 [solve-meta]
   analyzer-name = "dep"
