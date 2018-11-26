@@ -68,6 +68,7 @@ func TestExpand(t *testing.T) {
 				"github.com/teamwork/utils/goutil",
 				"github.com/teamwork/utils/httputilx",
 				"github.com/teamwork/utils/httputilx/header",
+				"github.com/teamwork/utils/imageutil",
 				"github.com/teamwork/utils/ioutilx",
 				"github.com/teamwork/utils/jsonutil",
 				"github.com/teamwork/utils/maputil",
