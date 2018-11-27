@@ -6,6 +6,7 @@ package imageutil
 
 import (
 	"bytes"
+	"io"
 )
 
 // The algorithm uses at most sniffLen bytes to make its decision.
@@ -34,6 +35,26 @@ func DetectImage(data []byte) string {
 	}
 
 	return ""
+}
+
+// DetectImageStream works like DetectImage, but operates on a file stream. It
+// reads the minimal amount of data needed and Seek() back to where the offset
+// was.
+func DetectImageStream(fp io.ReadSeeker) (string, error) {
+	head := make([]byte, sniffLen)
+	n, err := fp.Read(head)
+	if err != nil {
+		return "", err
+	}
+
+	ct := DetectImage(head)
+
+	_, err = fp.Seek(int64(-n), io.SeekCurrent)
+	if err != nil {
+		return "", err
+	}
+
+	return ct, nil
 }
 
 type sniffSig interface {
