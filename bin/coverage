@@ -1,35 +1,28 @@
 #!/bin/bash
 #
-# Generated from https://github.com/Teamwork/skel-go
+# Generated from https://github.com/Teamwork/strut
 # DO NOT EDIT DIRECTLY!
 
 # Setup
 #######
 set -euC
 root="$(cd "$(dirname "$0")/.." && pwd)"
-options_func=":"
-. "$root/bin/start"
+# shellcheck source=load-settings
+. "$root/bin/load-settings"
 
 # Run action
 ############
 
-# TODO: grep tags from $@ and pass it to go list.
-
-# Pass all packages to -coverpkg to count coverage for all packages.
-allpkg=$(go list ./... |
-	grep -v /vendor/ |
-	tr '\n' , |
-	sed -e 's/,$//')
-
 "$root/bin/test" \
-    -covermode=count \
-    -coverprofile=coverage.txt \
-    -coverpkg=$allpkg \
-    ./... 2>&1 | grep -v 'warning: no packages being tested depend on '
+	-coverprofile=coverage.txt \
+	-coverpkg=./... \
+	"$@"
 
 # The token is optional for public repos.
 [ -n "${codecov_token:-}" ] && export CODECOV_TOKEN="$codecov_token"
 
 # Submit reports only on Travis.
-[ -n "${TRAVIS:-}" ] && \
-    ./bin/.codecov -X gcov -X coveragepy -X search -K -f coverage.txt
+[ -n "${TRAVIS:-}" ] &&
+	./bin/.codecov -X gcov -X coveragepy -X search -K -f coverage.txt
+
+exit 0

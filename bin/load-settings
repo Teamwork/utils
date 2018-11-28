@@ -1,13 +1,15 @@
 # vi:ft=sh
 #
-# Generated from https://github.com/Teamwork/skel-go
+# Generated from https://github.com/Teamwork/strut
 # DO NOT EDIT DIRECTLY!
 
 set -euC
 
+# shellcheck disable=SC2154
 cd "$root"
 
 # Load settings
+# shellcheck disable=SC1090
 [ -f "$root/bin/settings" ] && . "$root/bin/settings"
 
 ###
@@ -20,6 +22,8 @@ codecov_token=${codecov_token:-}
 # separated by newlines.
 lint_ignore="${lint_ignore:-}"
 
+# Don't check for changes in generated files with ./bin/lint.
+lint_skip_generate="${lint_skip_generate:-0}"
 
 ###
 # For the following the defaults should almost always be okay. If not, then
@@ -32,7 +36,7 @@ name=${name:-$(basename "$root")}
 pkgname=${pkgname:-"github.com/teamwork/$name"}
 
 # Git branch
-branch=${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}}
+branch=${branch:-${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH:-$(git rev-parse --abbrev-ref HEAD)}}}
 
 # Docker image tag; usually the commit
 docker_tag=${docker_tag:-${TRAVIS_COMMIT:-dev-env}}
@@ -40,37 +44,12 @@ docker_tag=${docker_tag:-${TRAVIS_COMMIT:-dev-env}}
 # Make sure this is set locally so we can do -z/-n.
 TRAVIS=${TRAVIS:-}
 
-# So scripts can override this.
-usage_func=${usage_func:-_usage}
-options_func=${options_func:-_parse_options}
-
-# Usage info.
-_usage() {
-	echo "Usage: ${0##*/} [-hv] [-t tag]"
-	echo
-	echo "$usage"
-	echo
-	echo "Options:"
-	echo "  -h     Show this help"
-	echo "  -t     Set tag for Docker and main.version"
-	echo
+do_deploy=0
+check_deploy() {
+	case "$branch" in
+		master | beta)
+			# shellcheck disable=SC2034
+			do_deploy=1
+			;;
+	esac
 }
-
-# Parse options
-_parse_options() {
-	while getopts "hvt:b:" option; do
-		case "$option" in
-			h) $usage_func; exit 0 ;;
-			t) tag=$OPTARG ;;
-			#*)
-			#	echo "error: unknown option '$option'"
-			#	$usage_func
-			#	exit 1
-			#	;;
-		esac
-	done
-
-	return 0
-}
-
-$options_func "$@"
