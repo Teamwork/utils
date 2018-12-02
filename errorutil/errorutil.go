@@ -42,7 +42,7 @@ type Patterns struct {
 // /home/martin/go/src/.../file.go).
 //
 // Anything else is matches against the package path (i.e. github.com/foo/bar).
-func FilterPattern(mode int, paths ...string) Patterns {
+func FilterPattern(mode int, paths ...string) *Patterns {
 	var pat Patterns
 	switch mode {
 	case FilterTraceExlude:
@@ -72,7 +72,7 @@ func FilterPattern(mode int, paths ...string) Patterns {
 		}
 	}
 
-	return pat
+	return &pat
 }
 
 // Match a file path.
@@ -85,20 +85,33 @@ func (p Patterns) Match(pc uintptr) bool {
 			return p.ret
 		}
 	}
-	for _, d := range p.pkgs {
+
+	if len(p.pkgs) > 0 {
+		// Get package name.
 		pkg := fn.Name()
-		if i := strings.LastIndex(pkg, "."); i > -1 {
-			pkg = pkg[:i]
+		s := strings.LastIndex(pkg, "/")
+		if s < 0 {
+			s = 0
 		}
-		if pkg == d {
-			return p.ret
+		if d := strings.Index(pkg[s:], "."); d > -1 {
+			pkg = pkg[:s+d]
+		}
+		if v := strings.Index(pkg, "/vendor/"); v > -1 {
+			pkg = pkg[v+8:]
+		}
+		for _, d := range p.pkgs {
+			if strings.HasPrefix(pkg, d) {
+				return p.ret
+			}
 		}
 	}
+
 	for _, m := range p.matches {
 		if ok, err := filepath.Match(m, file); ok && err == nil {
 			return p.ret
 		}
 	}
+
 	for _, r := range p.regexps {
 		if r.MatchString(file) {
 			return p.ret
@@ -109,7 +122,7 @@ func (p Patterns) Match(pc uintptr) bool {
 }
 
 // FilterTrace removes unneeded stack traces from an error.
-func FilterTrace(err error, p Patterns) error {
+func FilterTrace(err error, p *Patterns) error {
 	tErr, ok := err.(stackTracer)
 	if !ok {
 		return err

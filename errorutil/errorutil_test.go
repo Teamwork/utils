@@ -56,6 +56,14 @@ func TestFilterInclude(t *testing.T) {
 	}
 }
 
+func TestFilterNil(t *testing.T) {
+	var err error
+	err = FilterTrace(err, FilterPattern(FilterTraceExlude, "testing"))
+	if err != nil {
+		t.Errorf("wrong error: %v", err)
+	}
+}
+
 func makeErr() error {
 	err := zxc()
 	return errors.WithStack(err)
