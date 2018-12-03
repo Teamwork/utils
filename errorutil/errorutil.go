@@ -1,4 +1,6 @@
 // Package errorutil provides functions to work with errors.
+//
+// Many of these functions work with the github.com/pkg/errors package.
 package errorutil // import "github.com/teamwork/utils/errorutil"
 
 import (
@@ -149,21 +151,67 @@ func FilterTrace(err error, p *Patterns) error {
 	}
 }
 
-type stackTracer interface {
-	StackTrace() errors.StackTrace
-}
-
-type withStack struct {
-	err   error
-	stack errors.StackTrace
-}
-
-func (w *withStack) Cause() error                  { return w.err }
-func (w *withStack) StackTrace() errors.StackTrace { return w.stack }
-
-func (w *withStack) Error() string {
-	if w.err == nil {
-		return ""
+// EarliestStackTracer get the first error in the error stack which has a stack
+// trace associated with it.
+//
+// It will return nil if there are no errors with a stack trace.
+func EarliestStackTracer(err error) error {
+	var tracer error
+	for err != nil {
+		if _, ok := err.(stackTracer); ok {
+			tracer = err
+		}
+		cause, ok := err.(causer)
+		if !ok {
+			break
+		}
+		err = cause.Cause()
 	}
-	return w.err.Error()
+
+	return tracer
+}
+
+const maxStackFrames = 25
+
+var myPath string
+
+func init() {
+	_, file, _, _ := runtime.Caller(0)
+	myPath = filepath.Dir(file)
+}
+
+// AddStackTrace adds a stack trace to an error if there isn't one already.
+//
+// Stack frames in the path ignore will be ignored at the start.
+func AddStackTrace(err error, ignore string) error {
+	if err == nil {
+		return err
+	}
+	if _, ok := err.(stackTracer); ok {
+		return err
+	}
+
+	pc := make([]uintptr, maxStackFrames)
+	count := runtime.Callers(1, pc)
+
+	var i int
+	for ; i < count; i++ {
+		fn := runtime.FuncForPC(pc[i])
+		file, _ := fn.FileLine(pc[i])
+		if (ignore != "" && strings.HasPrefix(file, ignore)) || strings.HasPrefix(file, myPath) {
+			continue
+		}
+
+		break
+	}
+
+	stack := make([]errors.Frame, count-i)
+	for j, ptr := range pc[i:count] {
+		stack[j] = errors.Frame(ptr)
+	}
+
+	return &withStack{
+		err:   err,
+		stack: stack,
+	}
 }
