@@ -19,7 +19,43 @@ func TestMustMarshal(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			out := MustMarshal(tc.in)
 			if !reflect.DeepEqual(out, tc.want) {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+				t.Errorf("\nout:  %s\nwant: %s\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestMustMarshalIndent(t *testing.T) {
+	cases := []struct {
+		in   map[string]string
+		want []byte
+	}{
+		{map[string]string{"hello": "world", "a": "b"}, []byte("{\n  \"a\": \"b\",\n  \"hello\": \"world\"\n}")},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := MustMarshalIndent(tc.in, "", "  ")
+			if !reflect.DeepEqual(out, tc.want) {
+				t.Errorf("\nout:  %s\nwant: %s\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestMustFormat(t *testing.T) {
+	cases := []struct {
+		in   []byte
+		want []byte
+	}{
+		{[]byte(`{"hello": "world", "a": "b"}`), []byte("{\n  \"a\": \"b\",\n  \"hello\": \"world\"\n}")},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := MustIndent(tc.in, &map[string]string{}, "", "  ")
+			if !reflect.DeepEqual(out, tc.want) {
+				t.Errorf("\nout:  %s\nwant: %s\n", out, tc.want)
 			}
 		})
 	}
