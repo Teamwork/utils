@@ -49,7 +49,6 @@ func TestUpperFirst(t *testing.T) {
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
-			fmt.Println(out)
 		})
 	}
 }
@@ -71,7 +70,6 @@ func TestLowerFirst(t *testing.T) {
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
-			fmt.Println(out)
 		})
 	}
 }

@@ -413,3 +413,22 @@ func TestFilterInt(t *testing.T) {
 		})
 	}
 }
+func TestChooseString(t *testing.T) {
+	tests := []struct {
+		in   []string
+		want string
+	}{
+		{nil, ""},
+		{[]string{}, ""},
+		{[]string{"a"}, "a"},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := ChooseString(tt.in)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
