@@ -11,7 +11,7 @@ func TestFilterExclude(t *testing.T) {
 	err := makeErr()
 	err = errors.Wrap(err, "w00t")
 	err = errors.Wrap(err, "context")
-	err = FilterTrace(err, FilterPattern(FilterTraceExlude,
+	err = FilterTrace(err, FilterPattern(FilterTraceExclude,
 		"testing",
 		"re:.*github.com/teamwork/utils/.*",
 	))
@@ -29,7 +29,7 @@ func TestFilterExcludeAll(t *testing.T) {
 	err := makeErr()
 	err = errors.Wrap(err, "w00t")
 	err = errors.Wrap(err, "context")
-	err = FilterTrace(err, FilterPattern(FilterTraceExlude, "re:.*"))
+	err = FilterTrace(err, FilterPattern(FilterTraceExclude, "re:.*"))
 
 	tErr, _ := err.(stackTracer)
 	if len(tErr.StackTrace()) != 3 {
@@ -58,7 +58,7 @@ func TestFilterInclude(t *testing.T) {
 
 func TestFilterNil(t *testing.T) {
 	var err error
-	err = FilterTrace(err, FilterPattern(FilterTraceExlude, "testing"))
+	err = FilterTrace(err, FilterPattern(FilterTraceExclude, "testing"))
 	if err != nil {
 		t.Errorf("wrong error: %v", err)
 	}
