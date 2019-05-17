@@ -14,7 +14,7 @@ import (
 
 // Modes for FilterPatterns.
 const (
-	FilterTraceExlude  = 0 // Exclude the paths that match.
+	FilterTraceExclude = 0 // Exclude the paths that match.
 	FilterTraceInclude = 1 // Include only the paths that match.
 )
 
@@ -29,7 +29,7 @@ type Patterns struct {
 
 // FilterPattern compiles filter patterns for FilterTrace()
 //
-// Frames are filtered according to the mode; with FilterTraceExlude all frames
+// Frames are filtered according to the mode; with FilterTraceExclude all frames
 // are included except those that match the given patterns. With
 // FilterTraceInclude all frames are excluded except those that match one of the
 // patterns.
@@ -45,7 +45,7 @@ type Patterns struct {
 func FilterPattern(mode int, paths ...string) *Patterns {
 	var pat Patterns
 	switch mode {
-	case FilterTraceExlude:
+	case FilterTraceExclude:
 		pat.ret = true
 	case FilterTraceInclude:
 		pat.ret = false
