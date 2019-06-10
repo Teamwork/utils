@@ -14,6 +14,8 @@ func Left(s string, n int) string {
 	if n < 0 {
 		n = 0
 	}
+
+	// Quick check for non-multibyte strings.
 	if len(s) <= n {
 		return s
 	}
@@ -23,13 +25,14 @@ func Left(s string, n int) string {
 		bytei int
 	)
 	for bytei = range s {
-		if chari >= n {
-			break
-		}
 		chari++
+
+		if chari > n {
+			return s[:bytei] + "…"
+		}
 	}
 
-	return s[:bytei] + "…"
+	return s
 }
 
 // UpperFirst transforms the first character to upper case, leaving the rest of
