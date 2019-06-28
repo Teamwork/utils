@@ -10,5 +10,6 @@ The naming scheme is `[type]util` or `[pkgname]util`. If there already is a
 
 Other useful packages:
 
-- [`github.com/Teamwork/toutf8`](https://github.com/Teamwork/toutf8) – Convert
+- [`github.com/teamwork/toutf8`](https://github.com/Teamwork/toutf8) – Convert
   strings to UTF-8.
+- [`github.com/jinzhu/now`](https://github.com/jinzhu/now) – Time toolkit.
