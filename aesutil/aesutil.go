@@ -45,7 +45,7 @@ func Decrypt(keyString string, base64Data string) ([]byte, error) {
 	}
 
 	if len(ciphertext) < aes.BlockSize {
-		return nil, errors.New("Ciphertext provided is smaller than AES block size")
+		return nil, errors.New("ciphertext provided is smaller than AES block size")
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
