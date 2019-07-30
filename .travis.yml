@@ -16,7 +16,6 @@ install: |
 script: |
   set -e
   cd $HOME/gopath/src/github.com/teamwork/utils
-  [ -f go.sum ] && export GO111MODULE=on ||:
   ./bin/coverage -race ./...
   env GO111MODULE=off ./bin/lint ./...
 
