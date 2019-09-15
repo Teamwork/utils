@@ -136,21 +136,23 @@ func TestBoolScan(t *testing.T) {
 	}{
 		{[]byte("true"), true, ""},
 		{float64(1.0), true, ""},
-		{[]byte{0x1}, true, ""},
+		{[]byte{1}, true, ""},
 		{int64(1), true, ""},
 		{"true", true, ""},
 		{true, true, ""},
 		{"1", true, ""},
+
 		{[]byte("false"), false, ""},
-		{float64(0.0), false, ""},
-		{[]byte{0x0}, false, ""},
+		{float64(0), false, ""},
+		{[]byte{0}, false, ""},
 		{int64(0), false, ""},
 		{"false", false, ""},
 		{false, false, ""},
 		{"0", false, ""},
 		{nil, false, ""},
-		{"not a valid bool", false, "invalid value 'not a valid bool'"},
-		{time.Time{}, false, "unsupported format time.Time"},
+
+		{"not a valid bool", false, "invalid value \"not a valid bool\""},
+		{time.Time{}, false, "unsupported type time.Time"},
 	}
 
 	for _, tc := range cases {
@@ -224,7 +226,7 @@ func TestBoolUnmarshalText(t *testing.T) {
 		{[]byte("false  "), false, ""},
 		{[]byte(`"false" `), false, ""},
 		{[]byte(` 0 `), false, ""},
-		{[]byte(`not a valid bool`), false, "invalid value 'not a valid bool'"},
+		{[]byte(`not a valid bool`), false, "invalid value \"not a valid bool\""},
 	}
 
 	for _, tc := range cases {

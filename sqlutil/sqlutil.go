@@ -43,6 +43,17 @@ func (l *IntList) Scan(v interface{}) error {
 	return nil
 }
 
+// MarshalText converts the data to a human readable representation.
+func (l IntList) MarshalText() ([]byte, error) {
+	v, err := l.Value()
+	return []byte(fmt.Sprintf("%s", v)), err
+}
+
+// UnmarshalText parses text in to the Go data structure.
+func (l *IntList) UnmarshalText(v []byte) error {
+	return l.Scan(v)
+}
+
 // StringList expands comma-separated values from a column to []string, and
 // stores []string as a comma-separated string.
 //
@@ -75,15 +86,25 @@ func (l *StringList) Scan(v interface{}) error {
 	return nil
 }
 
-// Bool add the capability to handle more column types than the usual sql
-// driver. The following types are supported when reading the data:
+// MarshalText converts the data to a human readable representation.
+func (l StringList) MarshalText() ([]byte, error) {
+	v, err := l.Value()
+	return []byte(fmt.Sprintf("%s", v)), err
+}
+
+// UnmarshalText parses text in to the Go data structure.
+func (l *StringList) UnmarshalText(v []byte) error {
+	return l.Scan(v)
+}
+
+// Bool converts various column types to a boolean.
 //
-//     * int64 and float64 - 0 for false, true otherwise
-//     * bool
-//     * []byte and string - "1" or "true" for true, and "0" or "false" for false. Also handles the 1 bit cases.
-//     * nil - defaults to false
+// Supported types:
 //
-// It is also prepared to be encoded and decoded to a human readable format.
+//   bool
+//   int* and float*     0 or 1
+//   []byte and string   "1", "true", "0", "false"
+//   nil                 defaults to false
 type Bool bool
 
 // Scan converts the different types of representation of a boolean in the
@@ -94,52 +115,63 @@ func (b *Bool) Scan(src interface{}) error {
 	}
 
 	switch v := src.(type) {
+	default:
+		return fmt.Errorf("unsupported type %T", src)
+	case nil:
+		*b = false
+	case bool:
+		*b = Bool(v)
+	case int:
+		*b = v != 0
+	case int8:
+		*b = v != 0
+	case int16:
+		*b = v != 0
+	case int32:
+		*b = v != 0
 	case int64:
+		*b = v != 0
+	case uint:
+		*b = v != 0
+	case uint8:
+		*b = v != 0
+	case uint16:
+		*b = v != 0
+	case uint32:
+		*b = v != 0
+	case uint64:
+		*b = v != 0
+	case float32:
 		*b = v != 0
 	case float64:
 		*b = v != 0
-	case bool:
-		*b = Bool(v)
 
 	case []byte, string:
 		var text string
-
-		if raw, ok := v.([]byte); ok {
-			// handle the bit(1) column type
-			if len(raw) == 1 {
-				if raw[0] == 0x1 {
-					*b = true
-					return nil
-
-				} else if raw[0] == 0x0 {
-					*b = false
-					return nil
-				}
-			}
-
-			text = string(raw)
-
-		} else {
+		if raw, ok := v.([]byte); !ok {
 			text = v.(string)
+		} else if len(raw) == 1 {
+			// Handle the bit(1) column type.
+			if raw[0] == 1 {
+				*b = true
+				return nil
+			} else if raw[0] == 0 {
+				*b = false
+				return nil
+			}
+		} else {
+			text = string(raw)
 		}
 
 		text = strings.TrimSpace(strings.ToLower(text))
-
 		switch text {
 		case "true", "1":
 			*b = true
 		case "false", "0":
 			*b = false
 		default:
-			return fmt.Errorf("invalid value '%s'", text)
+			return fmt.Errorf("invalid value %q", text)
 		}
-
-	case nil:
-		// nil will be considered false
-		*b = false
-
-	default:
-		return fmt.Errorf("unsupported format %T", src)
 	}
 
 	return nil
@@ -150,30 +182,25 @@ func (b Bool) Value() (driver.Value, error) {
 	return bool(b), nil
 }
 
-// MarshalText converts the bool to a human readable representation, that is
-// also compatible with the JSON format.
+// MarshalText converts the data to a JSON-compatible human readable
+// representation.
 func (b Bool) MarshalText() ([]byte, error) {
-	if b {
-		return []byte("true"), nil
-	}
-
-	return []byte("false"), nil
+	return []byte(fmt.Sprintf("%t", b)), nil
 }
 
-// UnmarshalText parse different types of human representation of the boolean
-// and convert it to the bool type. It is also compatible with the JSON format.
+// UnmarshalText parses text in to the Go data structure.
 func (b *Bool) UnmarshalText(text []byte) error {
 	if b == nil {
 		return fmt.Errorf("boolean not initialized")
 	}
 
-	normalized := strings.TrimSpace(strings.ToLower(string(text)))
-	if normalized == "true" || normalized == "1" || normalized == `"true"` {
+	switch strings.TrimSpace(strings.ToLower(string(text))) {
+	case "true", "1", `"true"`:
 		*b = true
-	} else if normalized == "false" || normalized == "0" || normalized == `"false"` {
+	case "false", "0", `"false"`:
 		*b = false
-	} else {
-		return fmt.Errorf("invalid value '%s'", normalized)
+	default:
+		return fmt.Errorf("invalid value %q", text)
 	}
 
 	return nil
