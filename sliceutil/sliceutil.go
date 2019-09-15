@@ -25,6 +25,17 @@ func JoinInt(ints []int64) string {
 	return strings.Join(intStr, ", ")
 }
 
+// JoinFloat converts a slice of floats to a comma separated string. Useful for
+// inserting into a query without the option of parameterization.
+func JoinFloat(nums []float64) string {
+	var numStr []string
+	for _, e := range nums {
+		numStr = append(numStr, strconv.FormatFloat(e, 'f', -1, 64))
+	}
+
+	return strings.Join(numStr, ", ")
+}
+
 // UniqInt64 removes duplicate entries from list. The list does not have to be
 // sorted.
 func UniqInt64(list []int64) []int64 {

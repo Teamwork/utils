@@ -54,6 +54,49 @@ func (l *IntList) UnmarshalText(v []byte) error {
 	return l.Scan(v)
 }
 
+// FloatList expands comma-separated values from a column to []float64, and
+// stores []float64 as a comma-separated string.
+//
+// This is safe for NULL values, in which case it will scan in to FloatList(nil).
+type FloatList []float64
+
+// Value implements the SQL Value function to determine what to store in the DB.
+func (l FloatList) Value() (driver.Value, error) {
+	return sliceutil.JoinFloat(l), nil
+}
+
+// Scan converts the data returned from the DB into the struct.
+func (l *FloatList) Scan(v interface{}) error {
+	if v == nil {
+		return nil
+	}
+	nums := []float64{}
+	for _, i := range strings.Split(fmt.Sprintf("%s", v), ",") {
+		i = strings.TrimSpace(i)
+		if i == "" {
+			continue
+		}
+		in, err := strconv.ParseFloat(i, 64)
+		if err != nil {
+			return err
+		}
+		nums = append(nums, in)
+	}
+	*l = nums
+	return nil
+}
+
+// MarshalText converts the data to a human readable representation.
+func (l FloatList) MarshalText() ([]byte, error) {
+	v, err := l.Value()
+	return []byte(fmt.Sprintf("%s", v)), err
+}
+
+// UnmarshalText parses text in to the Go data structure.
+func (l *FloatList) UnmarshalText(v []byte) error {
+	return l.Scan(v)
+}
+
 // StringList expands comma-separated values from a column to []string, and
 // stores []string as a comma-separated string.
 //
