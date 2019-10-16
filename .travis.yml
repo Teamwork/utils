@@ -1,23 +1,13 @@
 language: go
 go:
-  - 1.11.x
+  - 1.13.x
 go_import_path: github.com/teamwork/utils
+env:
+  - GO111MODULE=on
 notifications:
   email: false
   webhooks: http://tw-bot.teamworkops.com:8182/travis/buildstatus
-cache:
-  directories:
-    - $HOME/.cache/go-build
-    - $HOME/gopath/bin
-
-install: |
-  ./bin/setup-travis
-
-script: |
-  set -e
-  cd $HOME/gopath/src/github.com/teamwork/utils
-  ./bin/coverage -race ./...
-  env GO111MODULE=off ./bin/lint ./...
-
-before_cache: |
-  rm "$HOME/.cache/go-build/log.txt"
+script:
+  - 'go test -race -coverprofile=coverage.txt -coverpkg=./... ./...'
+after_success:
+  - 'bash <(curl -s https://codecov.io/bash)'

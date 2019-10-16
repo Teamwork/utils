@@ -13,7 +13,7 @@ func TestFilterExclude(t *testing.T) {
 	err = errors.Wrap(err, "context")
 	err = FilterTrace(err, FilterPattern(FilterTraceExclude,
 		"testing",
-		"re:.*github.com/teamwork/utils/.*",
+		"re:.*utils/errorutil.*",
 	))
 
 	tErr, _ := err.(stackTracer)
@@ -45,7 +45,7 @@ func TestFilterInclude(t *testing.T) {
 	err = errors.Wrap(err, "w00t")
 	err = errors.Wrap(err, "context")
 	err = FilterTrace(err, FilterPattern(FilterTraceInclude,
-		"re:.*github.com/teamwork/utils/.*"))
+		"re:.*utils/errorutil.*"))
 
 	tErr, _ := err.(stackTracer)
 	if len(tErr.StackTrace()) != 1 {
