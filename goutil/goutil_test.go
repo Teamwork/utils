@@ -93,14 +93,14 @@ func TestExpand(t *testing.T) {
 			"cannot resolve empty string",
 		},
 		{
-			[]string{"this/will/never/exist"},
+			[]string{"thi.s/will/never/exist"},
 			nil,
-			`cannot find package "this/will/never/exist"`,
+			`cannot find module providing package thi.s/will/never/exist`,
 		},
 		{
-			[]string{"this/will/never/exist/..."},
+			[]string{"thi.s/will/never/exist/..."},
 			nil,
-			`cannot find package "this/will/never/exist"`,
+			`cannot find module providing package thi.s/will/never/exist`,
 		},
 		{
 			[]string{"./doesnt/exist"},
