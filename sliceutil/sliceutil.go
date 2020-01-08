@@ -22,7 +22,7 @@ func JoinInt(ints []int64) string {
 		intStr = append(intStr, strconv.Itoa(int(e)))
 	}
 
-	return strings.Join(intStr, ", ")
+	return strings.Join(intStr, ",")
 }
 
 // UniqInt64 removes duplicate entries from list. The list does not have to be
