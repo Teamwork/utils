@@ -9,7 +9,7 @@ import (
 func ExampleSetCSP() {
 	static := "static.example.com"
 	headers := make(http.Header)
-	header.SetCSP(headers, header.CSPArgs{
+	header.SetCSP(headers, header.CSPArgs{ // nolint
 		header.CSPDefaultSrc: {header.CSPSourceNone},
 		header.CSPScriptSrc:  {static},
 		header.CSPStyleSrc:   {static, header.CSPSourceUnsafeInline},
@@ -22,7 +22,7 @@ func ExampleSetCSP() {
 
 func ExampleSetContentDisposition() {
 	headers := make(http.Header)
-	header.SetContentDisposition(headers, header.DispositionArgs{
+	header.SetContentDisposition(headers, header.DispositionArgs{ // nolint
 		Type:     "image/png",
 		Filename: "foo.png",
 	})

@@ -168,7 +168,7 @@ func (b *Bool) UnmarshalText(text []byte) error {
 	}
 
 	normalized := strings.TrimSpace(strings.ToLower(string(text)))
-	if normalized == "true" || normalized == "1" || normalized == `"true"` {
+	if normalized == "true" || normalized == "1" || normalized == `"true"` { // nolint: gocritic
 		*b = true
 	} else if normalized == "false" || normalized == "0" || normalized == `"false"` {
 		*b = false

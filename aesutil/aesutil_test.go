@@ -75,7 +75,7 @@ func TestEncryptAndDecrypt(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if string(cipher) == "" {
+			if cipher == "" {
 				t.Fatalf("Encrypt failed, cipher result is empty string")
 			}
 
