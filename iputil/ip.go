@@ -1,4 +1,4 @@
-// package iputil defines type that will marshal/unmarshal an IP address as
+// Package iputil defines type that will marshal/unmarshal an IP address as
 // human readable IPv4 string rather than an unreadable byte stream.
 package iputil
 
