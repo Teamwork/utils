@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net"
 )
 
@@ -42,7 +42,7 @@ func (ip IP) Value() (driver.Value, error) {
 func (ip *IP) Scan(value interface{}) error {
 	str, ok := value.([]byte)
 	if !ok {
-		return errors.New("invalid type stored in sql for whitelist ip")
+		return fmt.Errorf("iputil: cannot scan type %T into ip.IP: %v", value, value)
 	}
 
 	*ip = IP(net.ParseIP(string(str)))
