@@ -1,6 +1,4 @@
-// Package iputil defines type that will marshal/unmarshal an IP address as
-// human readable IPv4 string rather than an unreadable byte stream.
-package iputil
+package netutil
 
 import (
 	"bytes"
@@ -46,7 +44,7 @@ func (ip *IP) Scan(value interface{}) error {
 	case string:
 		*ip = IP(net.ParseIP(v))
 	default:
-		return fmt.Errorf("iputil: cannot scan type %T into ip.IP: %v", value, value)
+		return fmt.Errorf("netutil: cannot scan type %T into ip.IP: %v", value, value)
 	}
 	return nil
 }
