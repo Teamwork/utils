@@ -21,6 +21,21 @@ func (ip IP) Lte(end net.IP) bool {
 	return bytes.Compare(ip, end) <= 0
 }
 
+// Gt will return if the IP is greater than to the given IP
+func (ip IP) Gt(start net.IP) bool {
+	return bytes.Compare(ip, start) > 0
+}
+
+// Lt will return if the IP is less than to the given IP
+func (ip IP) Lt(end net.IP) bool {
+	return bytes.Compare(ip, end) < 0
+}
+
+// Eq will return if the IP is less than to the given IP
+func (ip IP) Eq(cmp net.IP) bool {
+	return bytes.Compare(ip, cmp) == 0
+}
+
 // InRange will return if the IP is within the given range of addresses
 func (ip IP) InRange(start, end net.IP) bool {
 	return ip.Gte(start) && ip.Lte(end)

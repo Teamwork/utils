@@ -87,3 +87,13 @@ func TestIPScan(t *testing.T) {
 		t.Errorf("expected %v got %v", ipStr, ip.String())
 	}
 }
+
+func TestIPEquality(t *testing.T) {
+	ipStr := "127.0.0.1"
+
+	ip := IP(net.ParseIP(ipStr))
+	result := ip.Eq(net.ParseIP(ipStr))
+	if !result {
+		t.Error("expected equality to be true but got false")
+	}
+}
