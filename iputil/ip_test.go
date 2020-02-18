@@ -49,6 +49,12 @@ func TestIPRange(t *testing.T) {
 			net.ParseIP("127.1.0.0"),
 			true,
 		},
+		{
+			IP(net.ParseIP("127.0.0.1")),
+			net.ParseIP("127.0.0.1"),
+			net.ParseIP("127.0.0.1"),
+			true,
+		},
 	}
 
 	for idx, test := range cases {

@@ -13,19 +13,19 @@ import (
 // IP is a special wrapped type of net.IP
 type IP net.IP
 
-// Gt will return if the IP is greater than the given IP
-func (ip IP) Gt(start net.IP) bool {
+// Gte will return if the IP is greater than or equal to the given IP
+func (ip IP) Gte(start net.IP) bool {
 	return bytes.Compare(ip, start) >= 0
 }
 
-// Lt will return if the IP is less than the given IP
-func (ip IP) Lt(end net.IP) bool {
+// Lte will return if the IP is less than or equal to the given IP
+func (ip IP) Lte(end net.IP) bool {
 	return bytes.Compare(ip, end) <= 0
 }
 
 // InRange will return if the IP is within the given range of addresses
 func (ip IP) InRange(start, end net.IP) bool {
-	return ip.Gt(start) && ip.Lt(end)
+	return ip.Gte(start) && ip.Lte(end)
 }
 
 // String returns the IP as a string
