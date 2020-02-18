@@ -70,13 +70,19 @@ func TestIPScan(t *testing.T) {
 	ipStr := "127.0.0.1"
 
 	ip := IP{}
-	ip.Scan([]byte(ipStr))
+	err := ip.Scan([]byte(ipStr))
+	if err != nil {
+		t.Errorf("expected nil error but got %v", err)
+	}
 	if ip.String() != ipStr {
 		t.Errorf("expected %v got %v", ipStr, ip.String())
 	}
 
 	ip = IP{}
-	ip.Scan(ipStr)
+	err = ip.Scan(ipStr)
+	if err != nil {
+		t.Errorf("expected nil error but got %v", err)
+	}
 	if ip.String() != ipStr {
 		t.Errorf("expected %v got %v", ipStr, ip.String())
 	}

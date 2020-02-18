@@ -43,10 +43,8 @@ func (ip *IP) Scan(value interface{}) error {
 	switch v := value.(type) {
 	case []byte:
 		*ip = IP(net.ParseIP(string(v)))
-		break
 	case string:
 		*ip = IP(net.ParseIP(v))
-		break
 	default:
 		return fmt.Errorf("iputil: cannot scan type %T into ip.IP: %v", value, value)
 	}
