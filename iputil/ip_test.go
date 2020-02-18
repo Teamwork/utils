@@ -65,3 +65,19 @@ func TestIPRange(t *testing.T) {
 		})
 	}
 }
+
+func TestIPScan(t *testing.T) {
+	ipStr := "127.0.0.1"
+
+	ip := IP{}
+	ip.Scan([]byte(ipStr))
+	if ip.String() != ipStr {
+		t.Errorf("expected %v got %v", ipStr, ip.String())
+	}
+
+	ip = IP{}
+	ip.Scan(ipStr)
+	if ip.String() != ipStr {
+		t.Errorf("expected %v got %v", ipStr, ip.String())
+	}
+}

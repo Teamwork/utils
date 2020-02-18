@@ -40,12 +40,16 @@ func (ip IP) Value() (driver.Value, error) {
 
 // Scan will return the IP from the database
 func (ip *IP) Scan(value interface{}) error {
-	str, ok := value.([]byte)
-	if !ok {
+	switch v := value.(type) {
+	case []byte:
+		*ip = IP(net.ParseIP(string(v)))
+		break
+	case string:
+		*ip = IP(net.ParseIP(v))
+		break
+	default:
 		return fmt.Errorf("iputil: cannot scan type %T into ip.IP: %v", value, value)
 	}
-
-	*ip = IP(net.ParseIP(string(str)))
 	return nil
 }
 
@@ -56,7 +60,7 @@ func (ip *IP) MarshalJSON() ([]byte, error) {
 	return json.Marshal(net.ParseIP(ip.String()))
 }
 
-// UnmarshalJSON specifies how the IP should be returned in the JSON. For this we
+// UnmarshalJSON specifies how the IP should be parsed from the JSON. For this we
 // can just utilise the existing custom marshaling on the net.IP object as it
 // already does what we need.
 func (ip *IP) UnmarshalJSON(data []byte) error {
