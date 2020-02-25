@@ -62,14 +62,18 @@ type Byte float64
 var units = []string{"B", "KiB", "MiB", "GiB", "TiB", "PiB"}
 var unitsAsBytes = []string{"B", "KB", "MB", "GB", "TB", "PB"}
 
+// String will return the bytes formatted as "mebibytes" (multiples of 1024)
 func (b Byte) String() string {
 	return b.HumanReadable(1024, units)
 }
 
+// StringAsBytes will return the bytes formatted as "bytes" (multiples of 1000)
 func (b Byte) StringAsBytes() string {
 	return b.HumanReadable(1000, unitsAsBytes)
 }
 
+// HumanReadable will take a measurement multiple as well as a slice of formats
+// to convert the byte into a human readable format using the given parameters.
 func (b Byte) HumanReadable(measurement Byte, format []string) string {
 	i := 0
 	for ; i < len(units); i++ {
