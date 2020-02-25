@@ -60,14 +60,23 @@ func IsSignedZero(f float64) bool {
 type Byte float64
 
 var units = []string{"B", "KiB", "MiB", "GiB", "TiB", "PiB"}
+var unitsAsBytes = []string{"B", "KB", "MB", "GB", "TB", "PB"}
 
 func (b Byte) String() string {
+	return b.HumanReadable(1024, units)
+}
+
+func (b Byte) StringAsBytes() string {
+	return b.HumanReadable(1000, unitsAsBytes)
+}
+
+func (b Byte) HumanReadable(measurement Byte, format []string) string {
 	i := 0
 	for ; i < len(units); i++ {
-		if b < 1024 {
-			return fmt.Sprintf("%.1f%s", b, units[i])
+		if b < measurement {
+			return fmt.Sprintf("%.1f%s", b, format[i])
 		}
-		b /= 1024
+		b /= measurement
 	}
-	return fmt.Sprintf("%.1f%s", b*1024, units[i-1])
+	return fmt.Sprintf("%.1f%s", b*measurement, format[i-1])
 }
