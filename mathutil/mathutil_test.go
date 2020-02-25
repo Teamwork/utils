@@ -74,7 +74,7 @@ func TestIsSignedZero(t *testing.T) {
 	}
 }
 
-func TestByte(t *testing.T) {
+func TestMebi(t *testing.T) {
 	cases := []struct {
 		in   float64
 		want string
@@ -92,6 +92,31 @@ func TestByte(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out := Byte(tc.in).String()
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestByte(t *testing.T) {
+	cases := []struct {
+		in   float64
+		want string
+	}{
+		{500, "500.0B"},
+		{1023, "1.0KB"},
+		{1000, "1.0KB"},
+		{1424, "1.4KB"},
+		{152310, "152.3KB"},
+		{1024 * 1190, "1.2MB"},
+		{(math.Pow(1024, 5) * 3) + (math.Pow(1024, 4) * 400), "3.8PB"},
+		{(math.Pow(1024, 6) * 3) + (math.Pow(1024, 5) * 400), "3909.1PB"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := Byte(tc.in).StringAsBytes()
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
