@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Left returns the "n" left characters of the string.
+// Truncate returns the "n" left characters of the string.
 func Truncate(s string, n int) string {
 	if n <= 0 {
 		return ""
