@@ -57,17 +57,17 @@ func TestCSP(t *testing.T) {
 	}{
 		{CSPArgs{}, ""},
 		{
-			CSPArgs{CSPDefaultSrc: {CSPSourceSelf}},
+			CSPArgs{{CSPDefaultSrc, CSPSourceSelf}},
 			"default-src 'self'",
 		},
 		{
-			CSPArgs{CSPDefaultSrc: {CSPSourceSelf, "https://example.com"}},
+			CSPArgs{{CSPDefaultSrc, CSPSourceSelf, "https://example.com"}},
 			"default-src 'self' https://example.com",
 		},
 		{
 			CSPArgs{
-				CSPDefaultSrc: {CSPSourceSelf, "https://example.com"},
-				CSPConnectSrc: {"https://a.com", "https://b.com"},
+				{CSPDefaultSrc, CSPSourceSelf, "https://example.com"},
+				{CSPConnectSrc, "https://a.com", "https://b.com"},
 			},
 			"default-src 'self' https://example.com; connect-src https://a.com https://b.com",
 		},
