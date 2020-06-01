@@ -10,11 +10,11 @@ func ExampleSetCSP() {
 	static := "static.example.com"
 	headers := make(http.Header)
 	header.SetCSP(headers, header.CSPArgs{ // nolint
-		header.CSPDefaultSrc: {header.CSPSourceNone},
-		header.CSPScriptSrc:  {static},
-		header.CSPStyleSrc:   {static, header.CSPSourceUnsafeInline},
-		header.CSPFormAction: {header.CSPSourceSelf},
-		header.CSPReportURI:  {"/csp"},
+		{header.CSPDefaultSrc, header.CSPSourceNone},
+		{header.CSPScriptSrc, static},
+		{header.CSPStyleSrc, static, header.CSPSourceUnsafeInline},
+		{header.CSPFormAction, header.CSPSourceSelf},
+		{header.CSPReportURI, "/csp"},
 	})
 
 	// Output:
