@@ -4,7 +4,7 @@ go:
 go_import_path: github.com/teamwork/utils
 notifications:
   email: false
-  webhooks: http://tw-bot.teamworkops.com:8182/travis/buildstatus
+  webhooks: https://tw-bot.eu.teamworkops.com/travis/buildstatus
 cache:
   directories:
     - $HOME/.cache/go-build
