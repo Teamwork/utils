@@ -94,7 +94,7 @@ func IgnoreWeekendOnlyPeriods(ignore bool) PeriodOptionsFunc {
 	})
 }
 
-// WeekStartsOnSunday use Sunday as beggining of the week when calculating the
+// WeekStartsOnSunday use Sunday as beginning of the week when calculating the
 // periods.
 func WeekStartsOnSunday(startsOnSunday bool) PeriodOptionsFunc {
 	return PeriodOptionsFunc(func(p *PeriodOptions) {
