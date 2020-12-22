@@ -110,6 +110,25 @@ func TestWeeksOnPeriod(t *testing.T) {
 			},
 		},
 		{
+			name: "it should detect 7 weeks between 2 months, with flexible period",
+			period: Period{
+				Start: time.Date(2020, 11, 1, 0, 0, 0, 0, time.UTC),
+				End:   time.Date(2020, 12, 11, 0, 0, 0, 0, time.UTC),
+			},
+			optFuncs: []PeriodOptionsFunc{
+				FlexiblePeriod(true),
+			},
+			want: []string{
+				"2020-10-26:2020-11-01",
+				"2020-11-02:2020-11-08",
+				"2020-11-09:2020-11-15",
+				"2020-11-16:2020-11-22",
+				"2020-11-23:2020-11-29",
+				"2020-11-30:2020-12-06",
+				"2020-12-07:2020-12-13",
+			},
+		},
+		{
 			name: "it should detect 6 weeks between 2 months, ignoring weekend only periods",
 			period: Period{
 				Start: time.Date(2020, 11, 1, 0, 0, 0, 0, time.UTC),
@@ -179,6 +198,21 @@ func TestMonthsOnPeriod(t *testing.T) {
 				"2020-10-13:2020-10-31",
 				"2020-11-01:2020-11-30",
 				"2020-12-01:2020-12-11",
+			},
+		},
+		{
+			name: "it should detect 3 months, with flexible period",
+			period: Period{
+				Start: time.Date(2020, 10, 13, 0, 0, 0, 0, time.UTC),
+				End:   time.Date(2020, 12, 11, 0, 0, 0, 0, time.UTC),
+			},
+			optFuncs: []PeriodOptionsFunc{
+				FlexiblePeriod(true),
+			},
+			want: []string{
+				"2020-10-01:2020-10-31",
+				"2020-11-01:2020-11-30",
+				"2020-12-01:2020-12-31",
 			},
 		},
 		{

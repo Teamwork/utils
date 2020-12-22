@@ -81,6 +81,7 @@ type Period struct {
 type PeriodOptions struct {
 	ignoreWeekendOnly bool
 	startsOnSunday    bool
+	flexiblePeriod    bool
 }
 
 // PeriodOptionsFunc function to modify the period options.
@@ -99,6 +100,13 @@ func IgnoreWeekendOnlyPeriods(ignore bool) PeriodOptionsFunc {
 func WeekStartsOnSunday(startsOnSunday bool) PeriodOptionsFunc {
 	return PeriodOptionsFunc(func(p *PeriodOptions) {
 		p.startsOnSunday = startsOnSunday
+	})
+}
+
+// FlexiblePeriod change the start/end date to fit the desired grouping.
+func FlexiblePeriod(flexible bool) PeriodOptionsFunc {
+	return PeriodOptionsFunc(func(p *PeriodOptions) {
+		p.flexiblePeriod = flexible
 	})
 }
 
@@ -159,11 +167,13 @@ func groupPeriod(period Period, toStart, toEnd, add func(*now.Now) time.Time, op
 			Start: toStart(referenceDate),
 			End:   toEnd(referenceDate),
 		}
-		if p.Start.Before(period.Start) {
-			p.Start = period.Start
-		}
-		if p.End.After(period.End) {
-			p.End = period.End
+		if !options.flexiblePeriod {
+			if p.Start.Before(period.Start) {
+				p.Start = period.Start
+			}
+			if p.End.After(period.End) {
+				p.End = period.End
+			}
 		}
 		periods = append(periods, p)
 
