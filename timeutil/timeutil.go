@@ -1,6 +1,10 @@
 package timeutil // import "github.com/teamwork/utils/timeutil"
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/now"
+)
 
 // UnixMilli returns the number of milliseconds elapsed since January 1, 1970
 // UTC.
@@ -65,4 +69,147 @@ func MonthsTo(a time.Time) int {
 		months = 1
 	}
 	return months
+}
+
+// Period stores the start and end dates of a period.
+type Period struct {
+	Start time.Time
+	End   time.Time
+}
+
+// PeriodOptions store options for period related functions.
+type PeriodOptions struct {
+	ignoreWeekendOnly bool
+	startsOnSunday    bool
+}
+
+// PeriodOptionsFunc function to modify the period options.
+type PeriodOptionsFunc func(p *PeriodOptions)
+
+// IgnoreWeekendOnlyPeriods ignore when the period only has weekdays on a
+// weekend.
+func IgnoreWeekendOnlyPeriods(ignore bool) PeriodOptionsFunc {
+	return PeriodOptionsFunc(func(p *PeriodOptions) {
+		p.ignoreWeekendOnly = ignore
+	})
+}
+
+// WeekStartsOnSunday use Sunday as beggining of the week when calculating the
+// periods.
+func WeekStartsOnSunday(startsOnSunday bool) PeriodOptionsFunc {
+	return PeriodOptionsFunc(func(p *PeriodOptions) {
+		p.startsOnSunday = startsOnSunday
+	})
+}
+
+// WeeksOnPeriod extracts all weeks on the given period.
+func WeeksOnPeriod(period Period, optFuncs ...PeriodOptionsFunc) []Period {
+	return groupPeriod(
+		period,
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.BeginningOfWeek()
+		},
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.EndOfWeek()
+		},
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.AddDate(0, 0, 7)
+		},
+		optFuncs...,
+	)
+}
+
+// MonthsOnPeriod extracts all months on the given period.
+func MonthsOnPeriod(period Period, optFuncs ...PeriodOptionsFunc) []Period {
+	return groupPeriod(
+		period,
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.BeginningOfMonth()
+		},
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.EndOfMonth()
+		},
+		func(referenceDate *now.Now) time.Time {
+			return referenceDate.AddDate(0, 1, 0)
+		},
+		optFuncs...,
+	)
+}
+
+func groupPeriod(period Period, toStart, toEnd, add func(*now.Now) time.Time, optFuncs ...PeriodOptionsFunc) []Period {
+	options := PeriodOptions{
+		ignoreWeekendOnly: false,
+	}
+	for _, optFunc := range optFuncs {
+		optFunc(&options)
+	}
+
+	referenceDate := now.With(period.Start)
+	if options.startsOnSunday {
+		referenceDate.WeekStartDay = time.Sunday
+	} else {
+		referenceDate.WeekStartDay = time.Monday
+	}
+	referenceDate.Time = toStart(referenceDate)
+
+	var periods []Period
+
+	for referenceDate.Before(period.End) {
+		p := Period{
+			Start: toStart(referenceDate),
+			End:   toEnd(referenceDate),
+		}
+		if p.Start.Before(period.Start) {
+			p.Start = period.Start
+		}
+		if p.End.After(period.End) {
+			p.End = period.End
+		}
+		periods = append(periods, p)
+
+		// move to the next period
+		referenceDate.Time = add(referenceDate)
+	}
+
+	if options.ignoreWeekendOnly {
+		i := 0
+		for _, period := range periods {
+			weekendOnly := true
+			dateFunc := DateRange(period.Start, period.End)
+			for d := dateFunc(); !d.IsZero(); d = dateFunc() {
+				if d.Weekday() != time.Saturday && d.Weekday() != time.Sunday {
+					weekendOnly = false
+					break
+				}
+			}
+			if !weekendOnly {
+				periods[i] = period
+				i++
+			}
+		}
+		periods = periods[:i]
+	}
+
+	return periods
+}
+
+// DateRange iterates on each day between start and end.
+//
+//     dateFunc := timeutil.DateRange(startDate, endDate)
+//     for d := dateFunc(); !d.IsZero(); d = dateFunc() {
+//       println(d.Format(time.RFC3339))
+//     }
+func DateRange(start, end time.Time) func() time.Time {
+	// safety rounding
+	start = now.With(start).BeginningOfDay()
+	end = now.With(end).BeginningOfDay()
+
+	return func() time.Time {
+		if start.After(end) {
+			return time.Time{}
+		}
+		date := start
+		start = start.AddDate(0, 0, 1)
+		return date
+	}
 }
