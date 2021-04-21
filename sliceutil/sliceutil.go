@@ -160,6 +160,18 @@ func FilterString(list []string, fun func(string) bool) []string {
 	return ret
 }
 
+// RemoveString removes any occurrence of a string from a list.
+func RemoveString(list []string, s string) []string {
+	var i int
+	for _, item := range list {
+		if item != s {
+			list[i] = item
+			i++
+		}
+	}
+	return list[:i]
+}
+
 // FilterStringEmpty can be used as an argument for FilterString() and will
 // return false if e is empty or contains only whitespace.
 func FilterStringEmpty(e string) bool {
