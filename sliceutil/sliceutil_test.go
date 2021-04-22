@@ -432,3 +432,46 @@ func TestChooseString(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveString(t *testing.T) {
+	cases := []struct {
+		list []string
+		item string
+		want []string
+	}{
+		{
+			list: []string{"1", "2", "3", "4", "5"},
+			item: "3",
+			want: []string{"1", "2", "4", "5"},
+		},
+		{
+			list: []string{"1", "2", "3", "4", "5"},
+			item: "1",
+			want: []string{"2", "3", "4", "5"},
+		},
+		{
+			list: []string{"1", "2", "3", "4", "5"},
+			item: "5",
+			want: []string{"1", "2", "3", "4"},
+		},
+		{
+			list: []string{"1", "2", "3", "4", "5"},
+			item: "6",
+			want: []string{"1", "2", "3", "4", "5"},
+		},
+		{
+			list: []string{"2", "1", "2", "2", "2", "5", "2"},
+			item: "2",
+			want: []string{"1", "5"},
+		},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := RemoveString(tc.list, tc.item)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
