@@ -160,16 +160,14 @@ func FilterString(list []string, fun func(string) bool) []string {
 	return ret
 }
 
-// RemoveString removes any occurrence of a string from a list.
-func RemoveString(list []string, s string) []string {
-	var i int
+// RemoveString removes any occurrence of a string from a slice.
+func RemoveString(list []string, s string) (out []string) {
 	for _, item := range list {
 		if item != s {
-			list[i] = item
-			i++
+			out = append(out, item)
 		}
 	}
-	return list[:i]
+	return out
 }
 
 // FilterStringEmpty can be used as an argument for FilterString() and will
