@@ -6,6 +6,19 @@ import (
 	"strings"
 )
 
+// Truncate returns the "n" left characters of the string.
+func Truncate(s string, n int) string {
+	if n <= 0 {
+		return ""
+	}
+
+	if len([]rune(s)) <= n {
+		return s
+	}
+
+	return string([]rune(s)[:n])
+}
+
 // Left returns the "n" left characters of the string.
 //
 // If the string is shorter than "n" it will return the first "n" characters of

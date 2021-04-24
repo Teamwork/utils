@@ -6,6 +6,33 @@ import (
 	"testing"
 )
 
+func TestTruncate(t *testing.T) {
+	cases := []struct {
+		in   string
+		n    int
+		want string
+	}{
+		{"Hello", 100, "Hello"},
+		{"Hello", 1, "H"},
+		{"Hello", 5, "Hello"},
+		{"Hello", 4, "Hell"},
+		{"Hello", 0, ""},
+		{"Hello", -2, ""},
+		{"汉语漢語", 1, "汉"},
+		{"汉语漢語", 3, "汉语漢"},
+		{"汉语漢語", 4, "汉语漢語"},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := Truncate(tc.in, tc.n)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
 func TestLeft(t *testing.T) {
 	cases := []struct {
 		in   string
