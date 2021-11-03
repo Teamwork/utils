@@ -41,3 +41,19 @@ func Complement(a, b []int64) (aOnly, bOnly []int64) {
 
 	return aOnly, bOnly
 }
+
+// Intersection returns the elements common to both a and b
+func Intersection(a, b []int64) []int64 {
+	inter := []int64{}
+	hash := make(map[int64]bool, len(a))
+	for _, i := range a {
+		hash[i] = false
+	}
+	for _, i := range b {
+		if done, exists := hash[i]; exists && !done {
+			inter = append(inter, i)
+			hash[i] = true
+		}
+	}
+	return inter
+}

@@ -97,6 +97,64 @@ func TestComplement(t *testing.T) {
 	}
 }
 
+func TestIntersection(t *testing.T) {
+	type ciTest struct {
+		name   string
+		a      []int64
+		b      []int64
+		result []int64
+	}
+	tests := []ciTest{
+		{
+			name:   "EmptyLists",
+			result: []int64{},
+		},
+		{
+			name:   "AOnly",
+			a:      []int64{1, 2, 3},
+			result: []int64{},
+		},
+		{
+			name:   "BOnly",
+			b:      []int64{1, 2, 3},
+			result: []int64{},
+		},
+		{
+			name:   "Equal",
+			a:      []int64{1, 2, 3},
+			b:      []int64{1, 2, 3},
+			result: []int64{1, 2, 3},
+		},
+		{
+			name:   "Disjoint",
+			a:      []int64{1, 2, 3},
+			b:      []int64{5, 6, 7},
+			result: []int64{},
+		},
+		{
+			name:   "Overlap",
+			a:      []int64{1, 2, 3, 4},
+			b:      []int64{3, 4, 5, 6},
+			result: []int64{3, 4},
+		},
+		{
+			name:   "Overlap with repeated values",
+			a:      []int64{6, 4, 5, 3, 6},
+			b:      []int64{2, 1, 4, 3, 1},
+			result: []int64{4, 3},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := Intersection(test.a, test.b)
+
+			if !reflect.DeepEqual(result, test.result) {
+				t.Errorf("result wrong\ngot:  %#v\nwant: %#v\n", result, test.result)
+			}
+		})
+	}
+}
+
 func BenchmarkComplement_equal(b *testing.B) {
 	listA := []int64{1, 2, 3}
 	listB := []int64{1, 2, 3}
