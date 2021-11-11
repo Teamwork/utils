@@ -4,6 +4,7 @@ package stringutil // import "github.com/teamwork/utils/stringutil"
 import (
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // Left returns the "n" left characters of the string.
@@ -77,4 +78,14 @@ func GetLine(in string, n int) string {
 		return ""
 	}
 	return arr[n-1]
+}
+
+// StripWhitespaces removes every whitespace in a string.
+func StripWhitespaces(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, str)
 }
