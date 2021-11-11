@@ -125,6 +125,31 @@ func TestGetLine(t *testing.T) {
 	}
 }
 
+func TestStripWhitespaces(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{{
+		name: "it should strip all whitespaces",
+		in:   " A test phrase ",
+		want: "Atestphrase",
+	}, {
+		name: "it should return the same string",
+		in:   "no_whitespace",
+		want: "no_whitespace",
+	}}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := StripWhitespaces(tc.in)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
 func BenchmarkLeft(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
 	for n := 0; n < b.N; n++ {
