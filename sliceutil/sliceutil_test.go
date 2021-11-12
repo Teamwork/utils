@@ -260,6 +260,31 @@ func TestInStringSlice(t *testing.T) {
 	}
 }
 
+func TestInFoldedStringSlice(t *testing.T) {
+	tests := []struct {
+		list     []string
+		find     string
+		expected bool
+	}{
+		{[]string{"hello"}, "hello", true},
+		{[]string{"HELLO"}, "hello", true},
+		{[]string{"hello"}, "HELLO", true},
+		{[]string{"hello"}, "hell", false},
+		{[]string{"hello", "world", "test"}, "world", true},
+		{[]string{"hello", "world", "test"}, "", false},
+		{[]string{}, "", false},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := InFoldedStringSlice(tc.list, tc.find)
+			if got != tc.expected {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
 func TestInIntSlice(t *testing.T) {
 	tests := []struct {
 		list     []int
@@ -413,6 +438,7 @@ func TestFilterInt(t *testing.T) {
 		})
 	}
 }
+
 func TestChooseString(t *testing.T) {
 	tests := []struct {
 		in   []string
@@ -469,6 +495,33 @@ func TestRemoveString(t *testing.T) {
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			out := RemoveString(tc.list, tc.item)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestStringMap(t *testing.T) {
+	cases := []struct {
+		in   []string
+		want []string
+		f    func(string) string
+	}{
+		{
+			in:   []string{"a", "b", "c"},
+			want: []string{"", "", ""},
+			f:    func(string) string { return "" },
+		},
+		{
+			in:   []string{"a", "b", "c"},
+			want: []string{"aa", "bb", "cc"},
+			f:    func(c string) string { return c + c },
+		},
+	}
+	for _, tc := range cases {
+		t.Run("", func(t *testing.T) {
+			out := StringMap(tc.in, tc.f)
 			if !reflect.DeepEqual(tc.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
