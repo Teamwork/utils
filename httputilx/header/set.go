@@ -139,7 +139,7 @@ const (
 )
 
 // CSPArgs are arguments for SetCSP().
-type CSPArgs map[string][]string
+type CSPArgs [][]string
 
 // SetCSP sets a Content-Security-Policy header.
 //
@@ -166,13 +166,17 @@ func SetCSP(header http.Header, args CSPArgs) error {
 
 	var b strings.Builder
 	i := 1
-	for k, v := range args {
-		b.WriteString(k)
+	for _, v := range args {
+		if len(v) < 2 {
+			return errors.New("expected pair of values")
+		}
+
+		b.WriteString(v[0])
 		b.WriteString(" ")
 
-		for j := range v {
-			b.WriteString(v[j])
-			if j != len(v)-1 {
+		for j := range v[1:] {
+			b.WriteString(v[j+1])
+			if j != len(v)-2 {
 				b.WriteString(" ")
 			}
 		}
