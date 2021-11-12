@@ -13,7 +13,7 @@ func Truncate(s string, n int) string {
 		return ""
 	}
 
-	if len([]rune(s)) <= n {
+	if utf8.RuneCountInString(s) <= n {
 		return s
 	}
 
