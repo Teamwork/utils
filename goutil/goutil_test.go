@@ -39,8 +39,7 @@ func TestExpand(t *testing.T) {
 			[]string{"net/..."},
 			[]string{"net", "net/http", "net/http/cgi", "net/http/cookiejar",
 				"net/http/fcgi", "net/http/httptest", "net/http/httptrace",
-				"net/http/httputil", "net/http/internal", "net/http/internal/ascii",
-				"net/http/internal/testcert", "net/http/pprof",
+				"net/http/httputil", "net/http/internal", "net/http/pprof",
 				"net/internal/socktest", "net/mail", "net/rpc", "net/rpc/jsonrpc",
 				"net/smtp", "net/textproto", "net/url",
 			},
@@ -96,12 +95,12 @@ func TestExpand(t *testing.T) {
 		{
 			[]string{"thi.s/will/never/exist"},
 			nil,
-			`cannot find package "thi.s/will/never/exist"`,
+			`cannot find module providing package thi.s/will/never/exist`,
 		},
 		{
 			[]string{"thi.s/will/never/exist/..."},
 			nil,
-			`cannot find package "thi.s/will/never/exist"`,
+			`cannot find module providing package thi.s/will/never/exist`,
 		},
 		{
 			[]string{"./doesnt/exist"},
