@@ -91,10 +91,20 @@ func CSVtoInt64Slice(csv string) ([]int64, error) {
 	return ints, nil
 }
 
-// InStringSlice reports whether str is within list
+// InStringSlice reports whether str is within list(case-sensitive)
 func InStringSlice(list []string, str string) bool {
 	for _, item := range list {
 		if item == str {
+			return true
+		}
+	}
+	return false
+}
+
+// InFoldedStringSlice reports whether str is within list(case-insensitive)
+func InFoldedStringSlice(list []string, str string) bool {
+	for _, item := range list {
+		if strings.EqualFold(item, str) {
 			return true
 		}
 	}
@@ -193,4 +203,14 @@ func FilterInt(list []int64, fun func(int64) bool) []int64 {
 // return false if e is empty or contains only whitespace.
 func FilterIntEmpty(e int64) bool {
 	return e != 0
+}
+
+// StringMap returns a list strings where each item in list has been modified by f
+func StringMap(list []string, f func(string) string) []string {
+	ret := make([]string, len(list))
+	for i := range list {
+		ret[i] = f(list[i])
+	}
+
+	return ret
 }

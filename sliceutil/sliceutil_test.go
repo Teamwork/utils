@@ -260,6 +260,31 @@ func TestInStringSlice(t *testing.T) {
 	}
 }
 
+func TestInFoldedStringSlice(t *testing.T) {
+	tests := []struct {
+		list     []string
+		find     string
+		expected bool
+	}{
+		{[]string{"hello"}, "hello", true},
+		{[]string{"HELLO"}, "hello", true},
+		{[]string{"hello"}, "HELLO", true},
+		{[]string{"hello"}, "hell", false},
+		{[]string{"hello", "world", "test"}, "world", true},
+		{[]string{"hello", "world", "test"}, "", false},
+		{[]string{}, "", false},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := InFoldedStringSlice(tc.list, tc.find)
+			if got != tc.expected {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
 func TestInIntSlice(t *testing.T) {
 	tests := []struct {
 		list     []int
