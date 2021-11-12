@@ -96,12 +96,12 @@ func TestExpand(t *testing.T) {
 		{
 			[]string{"thi.s/will/never/exist"},
 			nil,
-			"no required module provides package thi.s/will/never/exist;",
+			`cannot find package "thi.s/will/never/exist"`,
 		},
 		{
 			[]string{"thi.s/will/never/exist/..."},
 			nil,
-			`no required module provides package thi.s/will/never/exist;`,
+			`cannot find package "thi.s/will/never/exist"`,
 		},
 		{
 			[]string{"./doesnt/exist"},
