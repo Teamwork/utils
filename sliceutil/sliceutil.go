@@ -8,6 +8,7 @@ package sliceutil // import "github.com/teamwork/utils/sliceutil"
 
 import (
 	"math/rand"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -213,4 +214,26 @@ func StringMap(list []string, f func(string) string) []string {
 	}
 
 	return ret
+}
+
+// InterfaceSliceTo converts []interface to any given slice.
+// It will ~optimistically~ try to convert interface item to the dst item type
+func InterfaceSliceTo(src []interface{}, dst interface{}) interface{} {
+	dstt := reflect.TypeOf(dst)
+	if dstt.Kind() != reflect.Slice {
+		panic("`t` is not an slice")
+	}
+
+	dstV := reflect.ValueOf(dst)
+	dstt.Elem()
+
+	for i := range src {
+		if i < dstV.Len() {
+			dstV.Index(i).Set(reflect.ValueOf(src[i]).Convert(dstt.Elem()))
+			continue
+		}
+		dstV = reflect.Append(dstV, reflect.ValueOf(src[i]).Convert(dstt.Elem()))
+	}
+	return dstV.Interface()
+
 }
