@@ -221,11 +221,10 @@ func StringMap(list []string, f func(string) string) []string {
 func InterfaceSliceTo(src []interface{}, dst interface{}) interface{} {
 	dstt := reflect.TypeOf(dst)
 	if dstt.Kind() != reflect.Slice {
-		panic("`t` is not an slice")
+		panic("`dst` is not an slice")
 	}
 
 	dstV := reflect.ValueOf(dst)
-	dstt.Elem()
 
 	for i := range src {
 		if i < dstV.Len() {
@@ -234,6 +233,6 @@ func InterfaceSliceTo(src []interface{}, dst interface{}) interface{} {
 		}
 		dstV = reflect.Append(dstV, reflect.ValueOf(src[i]).Convert(dstt.Elem()))
 	}
-	return dstV.Interface()
 
+	return dstV.Interface()
 }
