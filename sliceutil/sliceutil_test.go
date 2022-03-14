@@ -528,3 +528,49 @@ func TestStringMap(t *testing.T) {
 		})
 	}
 }
+
+func TestInterfaceSliceTo(t *testing.T) {
+	{
+		src := []interface{}{"1", "2", "3", "4", "5"}
+		want := []string{"1", "2", "3", "4", "5"}
+		input := []string{""}
+
+		result := InterfaceSliceTo(src, input)
+		if !reflect.DeepEqual(result, want) {
+			t.Fatalf("want %+v(%T),\tgot %+v(%T)", want, want, result, result)
+		}
+	}
+
+	{
+		src := []interface{}{"1", "2", "3", "4", "5"}
+		want := []string{"1", "2", "3", "4", "5"}
+		input := []string{}
+
+		result := InterfaceSliceTo(src, input)
+		if !reflect.DeepEqual(result, want) {
+			t.Fatalf("want %+v(%T),\tgot %+v(%T)", want, want, result, result)
+		}
+	}
+
+	{
+		src := []interface{}{1, 2, 3, 4, 5}
+		want := []int{1, 2, 3, 4, 5}
+		input := []int{0, 0}
+
+		result := InterfaceSliceTo(src, input)
+		if !reflect.DeepEqual(result, want) {
+			t.Fatalf("want %+v(%T),\tgot %+v(%T)", want, want, result, result)
+		}
+	}
+
+	{
+		src := []interface{}{1, 2, 3, 4, 5}
+		want := []int64{1, 2, 3, 4, 5}
+		input := []int64{0, 0}
+
+		result := InterfaceSliceTo(src, input)
+		if !reflect.DeepEqual(result, want) {
+			t.Fatalf("want %+v(%T),\tgot %+v(%T)", want, want, result, result)
+		}
+	}
+}
