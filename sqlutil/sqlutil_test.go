@@ -240,3 +240,272 @@ func TestBoolUnmarshalText(t *testing.T) {
 		})
 	}
 }
+
+func TestInterpolate(t *testing.T) {
+	tests := []struct {
+		name   string
+		in     string
+		params []interface{}
+		want   string
+	}{
+		{
+			name: "it should ignore queries without parameters",
+			in:   "SELECT 1 FROM table",
+			want: "SELECT 1 FROM table",
+		},
+		{
+			name:   "it should ignore queries without named parameters",
+			in:     "SELECT 1 FROM table WHERE condition = ?",
+			params: []interface{}{10},
+			want:   "SELECT 1 FROM table WHERE condition = ?",
+		},
+		{
+			name: "it should replace the longest strings first",
+			in:   "SELECT 1 FROM (SELECT 1 FROM table LIMIT :Page, 50) t LIMIT :PageThreshold, :PageSize",
+			params: []interface{}{
+				map[string]interface{}{
+					"Page":          1,
+					"PageThreshold": 10,
+					"PageSize":      50,
+				},
+			},
+			want: "SELECT 1 FROM (SELECT 1 FROM table LIMIT 1, 50) t LIMIT 10, 50",
+		},
+		{
+			name: "it should replace slice of strings",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []string{"a", "b", "c"},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN ('a', 'b', 'c')",
+		},
+		{
+			name: "it should replace a string",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": "a",
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN ('a')",
+		},
+		{
+			name: "it should replace slice of booleans",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []bool{true, false},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (true, false)",
+		},
+		{
+			name: "it should replace slice of int",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []int{1, 2, 3},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (1, 2, 3)",
+		},
+		{
+			name: "it should replace slice of int64",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []int64{1, 2, 3},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (1, 2, 3)",
+		},
+		{
+			name: "it should replace slice of float64",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []float64{1, 2, 3},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (1, 2, 3)",
+		},
+		{
+			name: "it should replace slice of time",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": []time.Time{
+						time.Date(2022, 4, 15, 0, 0, 0, 0, time.UTC),
+						time.Date(2022, 4, 16, 0, 0, 0, 0, time.UTC),
+					},
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN ('2022-04-15 00:00:00', '2022-04-16 00:00:00')",
+		},
+		{
+			name: "it should replace a time",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": time.Date(2022, 4, 15, 0, 0, 0, 0, time.UTC),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN ('2022-04-15 00:00:00')",
+		},
+		{
+			name: "it should replace an int",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": int(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an int8",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": int8(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an int16",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": int16(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an int32",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": int32(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an int64",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": int64(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an uint",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": uint(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an uint16",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": uint16(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an uint32",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": uint32(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace an uint64",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": uint64(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace a float32",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": float32(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace a float64",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: []interface{}{
+				map[string]interface{}{
+					"Value": float64(10),
+				},
+			},
+			want: "SELECT 1 FROM table WHERE condition IN (10)",
+		},
+		{
+			name: "it should replace a custom type",
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: func() []interface{} {
+				type example string
+				e := example("test")
+
+				return []interface{}{
+					map[string]interface{}{
+						"Value": e,
+					},
+				}
+			}(),
+			want: "SELECT 1 FROM table WHERE condition IN ('test')",
+		},
+		{
+			name: "it should replace a strange custom type", // best effort
+			in:   "SELECT 1 FROM table WHERE condition IN (:Value)",
+			params: func() []interface{} {
+				type example struct {
+					Value string
+				}
+				e := example{
+					Value: "test",
+				}
+
+				return []interface{}{
+					map[string]interface{}{
+						"Value": e,
+					},
+				}
+			}(),
+			want: "SELECT 1 FROM table WHERE condition IN ({test})",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			out := Interpolate(tc.in, tc.params...)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}

@@ -5,8 +5,11 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"html/template"
+	"reflect"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/teamwork/utils/sliceutil"
 )
@@ -191,4 +194,61 @@ func (h HTML) Value() (driver.Value, error) {
 func (h *HTML) Scan(v interface{}) error {
 	*h = HTML(v.([]byte))
 	return nil
+}
+
+// Interpolate replaces placeholders in the SQL query following Gorp named
+// parametes. This should be used only for debugging SQL queries, as it's unsafe
+// to execute without prepared statements.
+//
+// https://github.com/go-gorp/gorp#named-bind-parameters
+func Interpolate(query string, args ...interface{}) string {
+	if len(args) == 0 {
+		return query
+	}
+	mapParams, ok := args[0].(map[string]interface{})
+	if !ok {
+		return query
+	}
+
+	keys := make([]string, 0, len(mapParams))
+	for k := range mapParams {
+		keys = append(keys, k)
+	}
+
+	// descending sort to replace the longest strings first.
+	sort.Slice(keys, func(i, j int) bool {
+		return len(keys[i]) > len(keys[j])
+	})
+
+	for _, key := range keys {
+		value := mapParams[key]
+		switch v := value.(type) {
+		case []string:
+			query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("'%v'", strings.Join(v, "', '")))
+		case string:
+			query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("'%v'", value))
+		case []bool, []int, []int64, []float64:
+			noCommaList := strings.TrimSuffix(strings.TrimPrefix(fmt.Sprintf("%v", value), "["), "]")
+			commaList := fmt.Sprintf("%v", strings.Join(strings.Split(noCommaList, " "), ", "))
+			query = strings.ReplaceAll(query, ":"+key, commaList)
+		case []time.Time:
+			strs := make([]string, len(v))
+			for i, t := range v {
+				strs[i] = t.UTC().Format("2006-01-02 15:04:05")
+			}
+			query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("'%v'", strings.Join(strs, "', '")))
+		case time.Time:
+			query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("'%v'", v.UTC().Format("2006-01-02 15:04:05")))
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
+			query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("%v", value))
+		default:
+			valueType := reflect.TypeOf(value)
+			if valueType.ConvertibleTo(reflect.TypeOf("")) {
+				query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("'%v'", value))
+			} else {
+				query = strings.ReplaceAll(query, ":"+key, fmt.Sprintf("%v", value))
+			}
+		}
+	}
+	return query
 }
