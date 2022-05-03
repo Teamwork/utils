@@ -19,7 +19,7 @@ type IntList []int64
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l IntList) Value() (driver.Value, error) {
-	return sliceutil.JoinInt(l), nil
+	return sliceutil.Join(l), nil
 }
 
 // Scan converts the data returned from the DB into the struct.
@@ -55,7 +55,7 @@ type StringList []string
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l StringList) Value() (driver.Value, error) {
-	return strings.Join(sliceutil.FilterString(l, sliceutil.FilterStringEmpty), ","), nil
+	return strings.Join(sliceutil.Filter(l, sliceutil.FilterEmpty[string]), ","), nil
 }
 
 // Scan converts the data returned from the DB into the struct.

@@ -336,7 +336,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 	}
 
 	for _, entry := range entries {
-		if sliceutil.InStringSlice(ignoredNames, entry.Name()) {
+		if sliceutil.ItemInSlice(ignoredNames, entry.Name()) {
 			continue
 		}
 
