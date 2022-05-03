@@ -78,8 +78,8 @@ func CSVtoInt64Slice(csv string) ([]int64, error) {
 	return ints, nil
 }
 
-// ItemInSlice returns true if item is in the provided slice.
-func ItemInSlice[T comparable](tt []T, item T) bool {
+// Contains returns true if item is in the provided slice.
+func Contains[T comparable](tt []T, item T) bool {
 	for _, t := range tt {
 		if t == item {
 			return true
@@ -136,6 +136,8 @@ func Remove[T comparable](tt []T, remove T) (out []T) {
 	return out
 }
 
+// Filter filters a list. The function will be called for every item and
+// those that return false will not be included in the returned list.
 func Filter[T comparable](tt []T, fn func(T) bool) []T {
 	var ret []T
 	for _, t := range tt {

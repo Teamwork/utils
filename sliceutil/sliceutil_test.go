@@ -252,7 +252,7 @@ func TestItemInSlice_String(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := ItemInSlice(tc.list, tc.find)
+			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -300,7 +300,7 @@ func TestItemInSlice_Int(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := ItemInSlice(tc.list, tc.find)
+			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -323,7 +323,7 @@ func TestItemInSlice_Int64(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := ItemInSlice(tc.list, tc.find)
+			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}

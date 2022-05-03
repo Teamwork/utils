@@ -25,8 +25,8 @@ func DetectImage(data []byte) string {
 
 	// Index of the first non-whitespace byte in data.
 	firstNonWS := 0
-	//for ; firstNonWS < len(data) && isWS(data[firstNonWS]); firstNonWS++ {
-	//}
+	// for ; firstNonWS < len(data) && isWS(data[firstNonWS]); firstNonWS++ {
+	// }
 
 	for _, sig := range sniffSignatures {
 		if ct := sig.match(data, firstNonWS); ct != "" {
@@ -91,7 +91,7 @@ func (e *exactSig) match(data []byte, firstNonWS int) string {
 
 type maskedSig struct {
 	mask, pat []byte
-	//skipWS    bool
+	// skipWS    bool
 	ct string
 }
 
@@ -99,9 +99,9 @@ func (m *maskedSig) match(data []byte, firstNonWS int) string {
 	// pattern matching algorithm section 6
 	// https://mimesniff.spec.whatwg.org/#pattern-matching-algorithm
 
-	//if m.skipWS {
-	//	data = data[firstNonWS:]
-	//}
+	// if m.skipWS {
+	// 	data = data[firstNonWS:]
+	// }
 	if len(m.pat) != len(m.mask) {
 		return ""
 	}

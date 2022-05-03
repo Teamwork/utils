@@ -8,7 +8,7 @@ import (
 	"github.com/teamwork/test/diff"
 )
 
-func TestReverse(t *testing.T) {
+func TestSwap(t *testing.T) {
 	tests := []struct {
 		in       map[string]string
 		expected map[string]string
@@ -19,7 +19,7 @@ func TestReverse(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := Reverse(tc.in)
+			got := Swap(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}

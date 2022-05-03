@@ -8,7 +8,7 @@ func Difference[T comparable](set []T, others ...[]T) []T {
 	for _, item := range set {
 		var found bool
 		for _, o := range others {
-			if ItemInSlice(o, item) {
+			if Contains(o, item) {
 				found = true
 				break
 			}
@@ -28,13 +28,13 @@ func Difference[T comparable](set []T, others ...[]T) []T {
 // "a").
 func Complement[T comparable](a, b []T) (aOnly, bOnly []T) {
 	for _, i := range a {
-		if !ItemInSlice(b, i) {
+		if !Contains(b, i) {
 			aOnly = append(aOnly, i)
 		}
 	}
 
 	for _, i := range b {
-		if !ItemInSlice(a, i) {
+		if !Contains(a, i) {
 			bOnly = append(bOnly, i)
 		}
 	}

@@ -19,10 +19,10 @@ const (
 type DispositionArgs struct {
 	Type     string // disposition-type
 	Filename string // filename-parm
-	//CreationDate     time.Time // creation-date-parm
-	//ModificationDate time.Time // modification-date-parm
-	//ReadDate         time.Time // read-date-parm
-	//Size             int       // size-parm
+	// CreationDate     time.Time // creation-date-parm
+	// ModificationDate time.Time // modification-date-parm
+	// ReadDate         time.Time // read-date-parm
+	// Size             int       // size-parm
 }
 
 // SetContentDisposition sets the Content-Disposition header. Any previous value
