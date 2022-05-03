@@ -11,7 +11,7 @@ import (
 	"github.com/teamwork/test/diff"
 )
 
-func TestIntsToString(t *testing.T) {
+func TestJoin(t *testing.T) {
 	cases := []struct {
 		in       []int64
 		expected string
@@ -32,7 +32,7 @@ func TestIntsToString(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := JoinInt(tc.in)
+			got := Join(tc.in)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -40,7 +40,7 @@ func TestIntsToString(t *testing.T) {
 	}
 }
 
-func TestUniqInt64(t *testing.T) {
+func TestUniq_Int64(t *testing.T) {
 	cases := []struct {
 		in       []int64
 		expected []int64
@@ -69,7 +69,7 @@ func TestUniqInt64(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := UniqInt64(tc.in)
+			got := Unique(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -77,32 +77,7 @@ func TestUniqInt64(t *testing.T) {
 	}
 }
 
-func TestUniqueMergeSlices(t *testing.T) {
-	var tests = []struct {
-		in       [][]int64
-		expected []int64
-	}{
-		{
-			generate2dintslice([]int64{1, 2, 3}),
-			[]int64{1, 2, 3},
-		},
-		{
-			generate2dintslice([]int64{0, 1, 2, 3, -1, -10}),
-			[]int64{0, 1, 2, 3, -1, -10},
-		},
-	}
-
-	for i, tc := range tests {
-		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := UniqueMergeSlices(tc.in)
-			if !int64slicesequal(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
-			}
-		})
-	}
-}
-
-func TestUniqString(t *testing.T) {
+func TestUniq_String(t *testing.T) {
 	var tests = []struct {
 		in       []string
 		expected []string
@@ -119,8 +94,33 @@ func TestUniqString(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := UniqString(tc.in)
+			got := Unique(tc.in)
 			if !stringslicesequal(got, tc.expected) {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
+func TestMergeUnique_Int64(t *testing.T) {
+	var tests = []struct {
+		in       [][]int64
+		expected []int64
+	}{
+		{
+			generate2dintslice([]int64{1, 2, 3}),
+			[]int64{1, 2, 3},
+		},
+		{
+			generate2dintslice([]int64{0, 1, 2, 3, -1, -10}),
+			[]int64{0, 1, 2, 3, -1, -10},
+		},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := MergeUnique(tc.in)
+			if !int64slicesequal(got, tc.expected) {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
 		})
@@ -237,7 +237,7 @@ func TestCSVtoInt64Slice(t *testing.T) {
 	}
 }
 
-func TestInStringSlice(t *testing.T) {
+func TestItemInSlice_String(t *testing.T) {
 	tests := []struct {
 		list     []string
 		find     string
@@ -252,7 +252,7 @@ func TestInStringSlice(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := InStringSlice(tc.list, tc.find)
+			got := ItemInSlice(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -285,7 +285,7 @@ func TestInFoldedStringSlice(t *testing.T) {
 	}
 }
 
-func TestInIntSlice(t *testing.T) {
+func TestItemInSlice_Int(t *testing.T) {
 	tests := []struct {
 		list     []int
 		find     int
@@ -300,7 +300,7 @@ func TestInIntSlice(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := InIntSlice(tc.list, tc.find)
+			got := ItemInSlice(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -308,7 +308,7 @@ func TestInIntSlice(t *testing.T) {
 	}
 }
 
-func TestInInt64Slice(t *testing.T) {
+func TestItemInSlice_Int64(t *testing.T) {
 	tests := []struct {
 		list     []int64
 		find     int64
@@ -323,7 +323,7 @@ func TestInInt64Slice(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := InInt64Slice(tc.list, tc.find)
+			got := ItemInSlice(tc.list, tc.find)
 			if got != tc.expected {
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
@@ -353,34 +353,34 @@ func TestRange(t *testing.T) {
 	}
 }
 
-func TestFilterString(t *testing.T) {
+func TestFilter_String(t *testing.T) {
 	cases := []struct {
 		fun  func(string) bool
 		in   []string
 		want []string
 	}{
 		{
-			FilterStringEmpty,
+			FilterEmpty[string],
 			[]string(nil),
 			[]string(nil),
 		},
 		{
-			FilterStringEmpty,
+			FilterEmpty[string],
 			[]string{},
 			[]string(nil),
 		},
 		{
-			FilterStringEmpty,
+			FilterEmpty[string],
 			[]string{"1"},
 			[]string{"1"},
 		},
 		{
-			FilterStringEmpty,
+			FilterEmpty[string],
 			[]string{"", "1", ""},
 			[]string{"1"},
 		},
 		{
-			FilterStringEmpty,
+			FilterEmpty[string],
 			[]string{"", "1", "", "2", "asd", "", "", "", "zx", "", "a"},
 			[]string{"1", "2", "asd", "zx", "a"},
 		},
@@ -388,7 +388,7 @@ func TestFilterString(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := FilterString(tc.in, tc.fun)
+			out := Filter(tc.in, tc.fun)
 			if !reflect.DeepEqual(tc.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
@@ -396,34 +396,34 @@ func TestFilterString(t *testing.T) {
 	}
 }
 
-func TestFilterInt(t *testing.T) {
+func TestFilter_Int(t *testing.T) {
 	cases := []struct {
 		fun  func(int64) bool
 		in   []int64
 		want []int64
 	}{
 		{
-			FilterIntEmpty,
+			FilterEmpty[int64],
 			[]int64(nil),
 			[]int64(nil),
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty[int64],
 			[]int64{},
 			[]int64(nil),
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty[int64],
 			[]int64{1},
 			[]int64{1},
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty[int64],
 			[]int64{0, 1, 0},
 			[]int64{1},
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty[int64],
 			[]int64{0, 1, 0, 2, -1, 0, 0, 0, 42, 666, -666, 0, 0, 0},
 			[]int64{1, 2, -1, 42, 666, -666},
 		},
@@ -431,7 +431,7 @@ func TestFilterInt(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := FilterInt(tc.in, tc.fun)
+			out := Filter(tc.in, tc.fun)
 			if !reflect.DeepEqual(tc.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
@@ -439,7 +439,7 @@ func TestFilterInt(t *testing.T) {
 	}
 }
 
-func TestChooseString(t *testing.T) {
+func TestChoose_String(t *testing.T) {
 	tests := []struct {
 		in   []string
 		want string
@@ -451,7 +451,7 @@ func TestChooseString(t *testing.T) {
 
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := ChooseString(tt.in)
+			out := Choose(tt.in)
 			if out != tt.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
@@ -459,7 +459,7 @@ func TestChooseString(t *testing.T) {
 	}
 }
 
-func TestRemoveString(t *testing.T) {
+func TestRemove_String(t *testing.T) {
 	cases := []struct {
 		list []string
 		item string
@@ -494,7 +494,7 @@ func TestRemoveString(t *testing.T) {
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := RemoveString(tc.list, tc.item)
+			out := Remove(tc.list, tc.item)
 			if !reflect.DeepEqual(tc.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
@@ -502,7 +502,7 @@ func TestRemoveString(t *testing.T) {
 	}
 }
 
-func TestStringMap(t *testing.T) {
+func TestMap_String(t *testing.T) {
 	cases := []struct {
 		in   []string
 		want []string
@@ -521,7 +521,7 @@ func TestStringMap(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run("", func(t *testing.T) {
-			out := StringMap(tc.in, tc.f)
+			out := Map(tc.in, tc.f)
 			if !reflect.DeepEqual(tc.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}
