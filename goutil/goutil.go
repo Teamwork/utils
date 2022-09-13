@@ -77,6 +77,7 @@ func ResolvePackage(path string, mode build.ImportMode) (pkg *build.Package, err
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(path)
 		pkg, err = build.ImportDir(path, mode)
 	default:
 		if cwd == "" {

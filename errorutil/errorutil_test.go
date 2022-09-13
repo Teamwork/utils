@@ -1,7 +1,7 @@
 package errorutil
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -70,6 +70,6 @@ func makeErr() error {
 }
 
 func zxc() error {
-	_, err := ioutil.ReadFile("/var/empty/nonexistent")
+	_, err := os.ReadFile("/var/empty/nonexistent")
 	return errors.Wrap(err, "could not read")
 }

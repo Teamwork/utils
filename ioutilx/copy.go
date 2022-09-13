@@ -8,7 +8,6 @@ package ioutilx
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -290,7 +289,7 @@ var DefaultCopyTreeOptions = &CopyTreeOptions{
 //
 // The optional ignore argument is a callable. If given, it is called with the
 // `src` parameter, which is the directory being visited by CopyTree(), and
-// `names` which is the list of `src` contents, as returned by ioutil.ReadDir():
+// `names` which is the list of `src` contents, as returned by os.ReadDir():
 //
 //   callable(src, entries) -> ignoredNames
 //
@@ -320,9 +319,15 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		return &ErrExists{dst}
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return errors.Wrapf(err, "could not read %v", src)
+	}
+	fileInfos := make([]os.FileInfo, 0)
+	for _, entry := range entries {
+		if info, err := entry.Info(); err != nil {
+			fileInfos = append(fileInfos, info)
+		}
 	}
 
 	// Create dst.
@@ -332,7 +337,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 
 	ignoredNames := []string{}
 	if options.Ignore != nil {
-		ignoredNames = options.Ignore(src, entries)
+		ignoredNames = options.Ignore(src, fileInfos)
 	}
 
 	for _, entry := range entries {

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -88,7 +87,7 @@ func Fetch(url string) ([]byte, error) {
 
 	// TODO: Maybe add sanity check to bail out of the Content-Length is very
 	// large?
-	data, err := ioutil.ReadAll(response.Body)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read body of %v", url)
 	}
