@@ -121,6 +121,7 @@ func TestMergeUnique_Int64(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := MergeUnique(tc.in)
 			if !int64slicesequal(got, tc.expected) {
+				t.Log("IN", tc.in)
 				t.Errorf(diff.Cmp(tc.expected, got))
 			}
 		})
@@ -173,14 +174,17 @@ func stringslicesequal(a, b []string) bool {
 
 func generate2dintslice(in []int64) [][]int64 {
 	var (
-		result [][]int64
-		loops  = int(rand.Int63n(int64(len(in) * 2)))
+		result    [][]int64
+		processed = map[int]struct{}{}
+		loops     = int(rand.Int63n(int64(len(in)*2)) + 1)
 	)
 
-	for i := 0; i < loops; i++ {
+	for len(processed) < len(in) {
 		var s []int64
 		for i := 0; i < loops; i++ {
-			s = append(s, in[rand.Intn(len(in))])
+			idx := rand.Intn(len(in))
+			processed[idx] = struct{}{}
+			s = append(s, in[idx])
 		}
 		result = append(result, s)
 	}

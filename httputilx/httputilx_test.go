@@ -222,7 +222,3 @@ func TestFetch(t *testing.T) {
 		})
 	}
 }
-
-// TODO: Add test.
-func TestSave(t *testing.T) {
-}

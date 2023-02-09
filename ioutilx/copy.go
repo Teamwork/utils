@@ -291,7 +291,7 @@ var DefaultCopyTreeOptions = &CopyTreeOptions{
 // `src` parameter, which is the directory being visited by CopyTree(), and
 // `names` which is the list of `src` contents, as returned by os.ReadDir():
 //
-//   callable(src, entries) -> ignoredNames
+//	callable(src, entries) -> ignoredNames
 //
 // Since CopyTree() is called recursively, the callable will be called once for
 // each directory that is copied. It returns a list of names relative to the

@@ -1,3 +1,4 @@
+// Package mathutil provides functions for working with numbers.
 package mathutil // import "github.com/teamwork/utils/mathutil"
 
 import (

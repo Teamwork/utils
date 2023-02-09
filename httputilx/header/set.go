@@ -151,11 +151,11 @@ type CSPArgs [][]string
 //
 // Valid sources:
 //
-//   CSPSource*
-//   Hosts               example.com, *.example.com, https://example.com
-//   Schema              data:, blob:, etc.
-//   nonce-<val>         inline scripts using a cryptographic nonce
-//   <hash_algo>-<val>   hash of specific script.
+//	CSPSource*
+//	Hosts               example.com, *.example.com, https://example.com
+//	Schema              data:, blob:, etc.
+//	nonce-<val>         inline scripts using a cryptographic nonce
+//	<hash_algo>-<val>   hash of specific script.
 //
 // Also see: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP and
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy

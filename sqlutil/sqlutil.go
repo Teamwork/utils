@@ -78,10 +78,10 @@ func (l *StringList) Scan(v interface{}) error {
 // Bool add the capability to handle more column types than the usual sql
 // driver. The following types are supported when reading the data:
 //
-//     * int64 and float64 - 0 for false, true otherwise
-//     * bool
-//     * []byte and string - "1" or "true" for true, and "0" or "false" for false. Also handles the 1 bit cases.
-//     * nil - defaults to false
+//   - int64 and float64 - 0 for false, true otherwise
+//   - bool
+//   - []byte and string - "1" or "true" for true, and "0" or "false" for false. Also handles the 1 bit cases.
+//   - nil - defaults to false
 //
 // It is also prepared to be encoded and decoded to a human readable format.
 type Bool bool

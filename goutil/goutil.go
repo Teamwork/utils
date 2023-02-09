@@ -14,46 +14,38 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+
+	"golang.org/x/tools/go/packages"
 )
 
 // Expand a list of package and/or directory names to Go package names.
 //
-//  - "./example" is expanded to "full/package/path/example".
-//  - "/absolute/src/package/path" is abbreviated to "package/path".
-//  - "full/package" is kept-as is.
-//  - "package/path/..." will include "package/path" and all subpackages.
+//   - "./example" is expanded to "full/package/path/example".
+//   - "/absolute/src/package/path" is abbreviated to "package/path".
+//   - "full/package" is kept-as is.
+//   - "package/path/..." will include "package/path" and all subpackages.
 //
 // The packages will be sorted with duplicate packages removed. The /vendor/
 // directory is automatically ignored.
-func Expand(paths []string, mode build.ImportMode) ([]*build.Package, error) {
-	var out []*build.Package
-	seen := make(map[string]struct{})
-	for _, p := range paths {
-		if strings.HasSuffix(p, "/...") {
-			subPkgs, err := ResolveWildcard(p, mode)
-			if err != nil {
-				return nil, err
-			}
-			for _, sub := range subPkgs {
-				if _, ok := seen[sub.ImportPath]; !ok {
-					out = append(out, sub)
-					seen[sub.ImportPath] = struct{}{}
-				}
-			}
-			continue
-		}
-
-		pkg, err := ResolvePackage(p, mode)
-		if err != nil {
-			return nil, err
-		}
-		if _, ok := seen[pkg.ImportPath]; !ok {
-			out = append(out, pkg)
-			seen[pkg.ImportPath] = struct{}{}
-		}
+func Expand(paths []string, mode packages.LoadMode) ([]*packages.Package, error) {
+	pkgs, err := packages.Load(&packages.Config{Mode: mode}, paths...)
+	if err != nil {
+		return nil, err
 	}
 
-	sort.Slice(out, func(i, j int) bool { return out[i].ImportPath < out[j].ImportPath })
+	out := make([]*packages.Package, 0, len(pkgs))
+	for _, pkg := range pkgs {
+		if len(pkg.Errors) > 0 {
+			return nil, pkg.Errors[0]
+		}
+		out = append(out, pkg)
+	}
+
+	if len(out) == 0 {
+		return nil, errors.New("cannot find package")
+	}
+
+	sort.Slice(out, func(i, j int) bool { return out[i].PkgPath < out[j].PkgPath })
 
 	return out, nil
 }
@@ -250,7 +242,8 @@ func TagName(f *ast.Field, n string) string {
 }
 
 // Embedded struct:
-//  Foo `json:"foo"`
+//
+//	Foo `json:"foo"`
 func getEmbedName(f ast.Expr) string {
 start:
 	switch t := f.(type) {

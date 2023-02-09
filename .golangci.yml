@@ -6,9 +6,8 @@ linters:
   disable-all: true
   enable:
     - govet
-    - golint
-    - varcheck
-    - structcheck
+    - revive
+    - unused
     - errcheck
     - staticcheck
     - ineffassign

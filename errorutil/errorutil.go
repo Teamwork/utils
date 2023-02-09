@@ -27,7 +27,8 @@ type Patterns struct {
 	regexps []*regexp.Regexp
 }
 
-// FilterPattern compiles filter patterns for FilterTrace()
+// FilterPattern compiles filter patterns for FilterTrace().
+// Note: After go 1.13 this can include go run time data, excluding "re:.*runtime/*.s" is recommended.
 //
 // Frames are filtered according to the mode; with FilterTraceExclude all frames
 // are included except those that match the given patterns. With

@@ -112,8 +112,8 @@ func Choose[T any](tt []T) T {
 		var zero T
 		return zero
 	}
-	rand.Seed(time.Now().UnixNano())
-	return tt[rand.Intn(len(tt))]
+	source := rand.NewSource(time.Now().UnixNano())
+	return tt[rand.New(source).Intn(len(tt))]
 }
 
 // Range creates an []int counting at "start" up to (and including) "end".

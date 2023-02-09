@@ -1,3 +1,4 @@
+// Package ptrutil provides functions for working with pointers.
 package ptrutil
 
 // Dereference dereferences a pointer, returning zero if the pointer is nil.

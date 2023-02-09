@@ -3,7 +3,6 @@ package goutil
 import (
 	"fmt"
 	"go/ast"
-	"go/build"
 	"go/token"
 	"reflect"
 	"sort"
@@ -11,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/teamwork/test"
+	"golang.org/x/tools/go/packages"
 )
 
 // This also tests ResolvePackage() and ResolveWildcard().
@@ -57,6 +57,11 @@ func TestExpand(t *testing.T) {
 			"",
 		},
 		{
+			[]string{""},
+			[]string{"github.com/teamwork/utils/goutil"},
+			"",
+		},
+		{
 			[]string{".."},
 			[]string{"github.com/teamwork/utils"},
 			"",
@@ -90,31 +95,20 @@ func TestExpand(t *testing.T) {
 
 		// Errors
 		{
-			[]string{""},
+			[]string{"thi.s/will/never/exist/..."},
 			nil,
-			"cannot resolve empty string",
+			`cannot find package`,
 		},
-		// These tests pass locally but are dodgy on travis in go1.18
-		// {
-		// 	 []string{"thi.s/will/never/exist"},
-		// 	 nil,
-		// 	 `no required module provides package thi.s/will/never/exist`,
-		// },
-		// {
-		// 	 []string{"thi.s/will/never/exist/..."},
-		// 	 nil,
-		// 	 `no required module provides package thi.s/will/never/exist`,
-		// },
 		{
 			[]string{"./doesnt/exist"},
 			nil,
-			"cannot find package",
+			"directory not found",
 		},
 	}
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out, err := Expand(tc.in, build.FindOnly)
+			out, err := Expand(tc.in, packages.NeedName)
 			if !test.ErrorContains(err, tc.wantErr) {
 				t.Fatal(err)
 			}
@@ -122,7 +116,7 @@ func TestExpand(t *testing.T) {
 			sort.Strings(tc.want)
 			var outPkgs []string
 			for _, p := range out {
-				outPkgs = append(outPkgs, p.ImportPath)
+				outPkgs = append(outPkgs, p.PkgPath)
 			}
 
 			if !reflect.DeepEqual(tc.want, outPkgs) {

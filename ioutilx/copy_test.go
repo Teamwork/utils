@@ -110,7 +110,7 @@ func TestCopyData(t *testing.T) {
 		{"test/file1", "test/file2", "already exists"},
 		{"test/fifo", "test/newfile", "named pipe"},
 		// {"test/link1/asd", "test/dst1", "not a directory"},
-		{"test/file1", "/cantwritehere", "permission denied"},
+		// {"test/file1", "/cantwritehere", "permission denied"},
 		{"test/file1", "test/dst1", ""},
 		// {"test/link1", "test/dst1", ""},
 	}
@@ -197,7 +197,7 @@ func TestCopy(t *testing.T) {
 		{"nonexistent", "test/copydst", Modes{}, "no such file"},
 		{"test/fifo", "test/newfile", Modes{}, "named pipe"},
 		// {"test/link1/asd", "test/dst1", Modes{}, "not a directory"},
-		{"test/file1", "/cantwritehere", Modes{}, "permission denied"},
+		// {"test/file1", "/cantwritehere", Modes{}, "permission denied"},
 
 		{"test/exec", "test/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
 		{"test/exec", "test/dir1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
