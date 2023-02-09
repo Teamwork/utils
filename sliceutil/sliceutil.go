@@ -92,6 +92,16 @@ func CSVtoInt64Slice(csv string) ([]int64, error) {
 	return ints, nil
 }
 
+// InSlice reports whether a comparable type is within list(case-sensitive)
+func InSlice[T comparable](list []T, e T) bool {
+	for _, item := range list {
+		if item == e {
+			return true
+		}
+	}
+	return false
+}
+
 // InStringSlice reports whether str is within list(case-sensitive)
 func InStringSlice(list []string, str string) bool {
 	for _, item := range list {
