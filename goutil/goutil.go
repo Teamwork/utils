@@ -1,5 +1,5 @@
 // Package goutil provides functions to work with Go source files.
-package goutil // import "github.com/teamwork/utils/goutil"
+package goutil // import "github.com/teamwork/utils/v2/goutil"
 
 import (
 	"errors"

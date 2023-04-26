@@ -1,5 +1,5 @@
 // Package maputil provides a set if functions for working with maps.
-package maputil // import "github.com/teamwork/utils/maputil"
+package maputil // import "github.com/teamwork/utils/v2/maputil"
 
 // Swap the keys and values of a map.
 func Swap[T comparable, V comparable](m map[T]V) map[V]T {

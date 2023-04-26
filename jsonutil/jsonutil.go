@@ -1,5 +1,5 @@
 // Package jsonutil provides functions for working with JSON.
-package jsonutil // import "github.com/teamwork/utils/jsonutil"
+package jsonutil // import "github.com/teamwork/utils/v2/jsonutil"
 
 import "encoding/json"
 

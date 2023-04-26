@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/teamwork/utils/sliceutil"
+	"github.com/teamwork/utils/v2/sliceutil"
 )
 
 // ErrSameFile is used when the source and destination file are the same file.

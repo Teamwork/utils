@@ -1,5 +1,5 @@
 // Package dbg contains helper functions useful when debugging programs.
-package dbg // import "github.com/teamwork/utils/dbg"
+package dbg // import "github.com/teamwork/utils/v2/dbg"
 
 import (
 	"fmt"

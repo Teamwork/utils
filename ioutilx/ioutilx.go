@@ -1,5 +1,5 @@
 // Package ioutilx implements some I/O utility functions.
-package ioutilx // import "github.com/teamwork/utils/ioutilx"
+package ioutilx // import "github.com/teamwork/utils/v2/ioutilx"
 
 import (
 	"bytes"

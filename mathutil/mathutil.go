@@ -1,5 +1,5 @@
 // Package mathutil provides functions for working with numbers.
-package mathutil // import "github.com/teamwork/utils/mathutil"
+package mathutil // import "github.com/teamwork/utils/v2/mathutil"
 
 import (
 	"fmt"

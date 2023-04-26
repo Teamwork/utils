@@ -1,5 +1,5 @@
 // Package netutil provides functions expanding on net std package.
-package netutil // import "github.com/teamwork/utils/netutil"
+package netutil // import "github.com/teamwork/utils/v2/netutil"
 
 import "net"
 

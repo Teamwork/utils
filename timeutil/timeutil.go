@@ -1,5 +1,5 @@
 // Package timeutil provides functions for working with time.
-package timeutil // import "github.com/teamwork/utils/timeutil"
+package timeutil // import "github.com/teamwork/utils/v2/timeutil"
 
 import "time"
 

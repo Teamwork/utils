@@ -1,5 +1,5 @@
 // Package sqlutil provides some helpers for SQL databases.
-package sqlutil // import "github.com/teamwork/utils/sqlutil"
+package sqlutil // import "github.com/teamwork/utils/v2/sqlutil"
 
 import (
 	"database/sql/driver"
@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/teamwork/utils/sliceutil"
+	"github.com/teamwork/utils/v2/sliceutil"
 )
 
 // IntList expands comma-separated values from a column to []int64, and stores

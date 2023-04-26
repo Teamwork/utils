@@ -1,5 +1,5 @@
 // Package errorutil provides functions to work with errors.
-package errorutil // import "github.com/teamwork/utils/errorutil"
+package errorutil // import "github.com/teamwork/utils/v2/errorutil"
 
 import (
 	"fmt"

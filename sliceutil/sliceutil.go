@@ -4,7 +4,7 @@
 // "sets" (e.g. it will retain order, []int64 can contain duplicates). Consider
 // using something like golang-set if you want to use sets and care a lot about
 // performance: https://github.com/deckarep/golang-set
-package sliceutil // import "github.com/teamwork/utils/sliceutil"
+package sliceutil // import "github.com/teamwork/utils/v2/sliceutil"
 
 import (
 	"fmt"

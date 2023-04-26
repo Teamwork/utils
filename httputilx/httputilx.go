@@ -1,5 +1,5 @@
 // Package httputilx provides HTTP utility functions.
-package httputilx // import "github.com/teamwork/utils/httputilx"
+package httputilx // import "github.com/teamwork/utils/v2/httputilx"
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/teamwork/utils/ioutilx"
+	"github.com/teamwork/utils/v2/ioutilx"
 )
 
 // DumpBody reads the body of a HTTP request without consuming it, so it can be
