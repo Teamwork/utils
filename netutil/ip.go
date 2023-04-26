@@ -33,7 +33,7 @@ func (ip IP) Lt(end net.IP) bool {
 
 // Eq will return if the IP is less than to the given IP
 func (ip IP) Eq(cmp net.IP) bool {
-	return bytes.Compare(ip, cmp) == 0
+	return bytes.Equal(ip, cmp)
 }
 
 // InRange will return if the IP is within the given range of addresses

@@ -4,63 +4,49 @@
 // "sets" (e.g. it will retain order, []int64 can contain duplicates). Consider
 // using something like golang-set if you want to use sets and care a lot about
 // performance: https://github.com/deckarep/golang-set
-package sliceutil // import "github.com/teamwork/utils/sliceutil"
+package sliceutil // import "github.com/teamwork/utils/v2/sliceutil"
 
 import (
+	"fmt"
 	"math/rand"
 	"reflect"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
-// JoinInt converts a slice of ints to a comma separated string. Useful for
+// Join converts a slice of T to a comma separated string. Useful for
 // inserting into a query without the option of parameterization.
-func JoinInt(ints []int64) string {
-	var intStr []string
-	for _, e := range ints {
-		intStr = append(intStr, strconv.Itoa(int(e)))
+func Join[T any](tt []T) string {
+	var str []string
+	for _, t := range tt {
+		str = append(str, fmt.Sprintf("%v", t))
 	}
 
-	return strings.Join(intStr, ", ")
+	return strings.Join(str, ", ")
 }
 
-// UniqInt64 removes duplicate entries from list. The list does not have to be
-// sorted.
-func UniqInt64(list []int64) []int64 {
-	var unique []int64
-	seen := make(map[int64]struct{})
-	for _, l := range list {
-		if _, ok := seen[l]; !ok {
-			seen[l] = struct{}{}
-			unique = append(unique, l)
+// Unique removes duplicate entries from a list. The list does not have to be sorted.
+func Unique[T comparable](tt []T) []T {
+	var unique []T
+	seen := make(map[T]struct{})
+	for _, t := range tt {
+		if _, ok := seen[t]; !ok {
+			seen[t] = struct{}{}
+			unique = append(unique, t)
 		}
 	}
+
 	return unique
 }
 
-// UniqString removes duplicate entries from list.
-func UniqString(list []string) []string {
-	sort.Strings(list)
-	var last string
-	l := list[:0]
-	for _, str := range list {
-		if str != last {
-			l = append(l, str)
-		}
-		last = str
-	}
-	return l
-}
+// MergeUnique takes a slice of slices and returns an unsorted slice of
+// unique entries.
+func MergeUnique[T comparable](tt [][]T) (result []T) {
+	var m = make(map[T]bool)
 
-// UniqueMergeSlices takes a slice of slices of int64s and returns an unsorted
-// slice of unique int64s.
-func UniqueMergeSlices(s [][]int64) (result []int64) {
-	var m = make(map[int64]bool)
-
-	for _, el := range s {
-		for _, i := range el {
+	for _, t := range tt {
+		for _, i := range t {
 			m[i] = true
 		}
 	}
@@ -92,10 +78,10 @@ func CSVtoInt64Slice(csv string) ([]int64, error) {
 	return ints, nil
 }
 
-// InStringSlice reports whether str is within list(case-sensitive)
-func InStringSlice(list []string, str string) bool {
-	for _, item := range list {
-		if item == str {
+// Contains returns true if item is in the provided slice.
+func Contains[T comparable](tt []T, item T) bool {
+	for _, t := range tt {
+		if t == item {
 			return true
 		}
 	}
@@ -112,41 +98,22 @@ func InFoldedStringSlice(list []string, str string) bool {
 	return false
 }
 
-// InIntSlice reports whether i is within list
-func InIntSlice(list []int, i int) bool {
-	for _, item := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
-}
-
-// InInt64Slice reports whether i is within list
-func InInt64Slice(list []int64, i int64) bool {
-	for _, item := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
-}
-
-// RepeatString returns a slice with the string s reated n times.
-func RepeatString(s string, n int) (r []string) {
+// Repeat returns a slice with the item t reated n times.
+func Repeat[T any](t T, n int) (tt []T) {
 	for i := 0; i < n; i++ {
-		r = append(r, s)
+		tt = append(tt, t)
 	}
-	return r
+	return tt
 }
 
-// ChooseString chooses a random item from the list.
-func ChooseString(l []string) string {
-	if len(l) == 0 {
-		return ""
+// Choose chooses a random item from the list.
+func Choose[T any](tt []T) T {
+	if len(tt) == 0 {
+		var zero T
+		return zero
 	}
-	rand.Seed(time.Now().UnixNano())
-	return l[rand.Intn(len(l))]
+	source := rand.NewSource(time.Now().UnixNano())
+	return tt[rand.New(source).Intn(len(tt))]
 }
 
 // Range creates an []int counting at "start" up to (and including) "end".
@@ -158,59 +125,42 @@ func Range(start, end int) []int {
 	return rng
 }
 
-// FilterString filters a list. The function will be called for every item and
-// those that return false will not be included in the return value.
-func FilterString(list []string, fun func(string) bool) []string {
-	var ret []string
-	for _, e := range list {
-		if fun(e) {
-			ret = append(ret, e)
+// Remove removes any occurrence of a string from a slice.
+func Remove[T comparable](tt []T, remove T) (out []T) {
+	for _, t := range tt {
+		if t != remove {
+			out = append(out, t)
 		}
 	}
 
-	return ret
-}
-
-// RemoveString removes any occurrence of a string from a slice.
-func RemoveString(list []string, s string) (out []string) {
-	for _, item := range list {
-		if item != s {
-			out = append(out, item)
-		}
-	}
 	return out
 }
 
-// FilterStringEmpty can be used as an argument for FilterString() and will
-// return false if e is empty or contains only whitespace.
-func FilterStringEmpty(e string) bool {
-	return strings.TrimSpace(e) != ""
-}
-
-// FilterInt filters a list. The function will be called for every item and
-// those that return false will not be included in the return value.
-func FilterInt(list []int64, fun func(int64) bool) []int64 {
-	var ret []int64
-	for _, e := range list {
-		if fun(e) {
-			ret = append(ret, e)
+// Filter filters a list. The function will be called for every item and
+// those that return false will not be included in the returned list.
+func Filter[T comparable](tt []T, fn func(T) bool) []T {
+	var ret []T
+	for _, t := range tt {
+		if fn(t) {
+			ret = append(ret, t)
 		}
 	}
 
 	return ret
 }
 
-// FilterIntEmpty can be used as an argument for FilterInt() and will
-// return false if e is empty or contains only whitespace.
-func FilterIntEmpty(e int64) bool {
-	return e != 0
+// FilterEmpty can be used as an argument for Filter() and will
+// return false if e is zero value.
+func FilterEmpty[T comparable](t T) bool {
+	var zero T
+	return t != zero
 }
 
-// StringMap returns a list strings where each item in list has been modified by f
-func StringMap(list []string, f func(string) string) []string {
-	ret := make([]string, len(list))
-	for i := range list {
-		ret[i] = f(list[i])
+// Map returns a list where each item in list has been modified by fn
+func Map[T comparable](tt []T, fn func(T) T) []T {
+	ret := make([]T, len(tt))
+	for i, t := range tt {
+		ret[i] = fn(t)
 	}
 
 	return ret

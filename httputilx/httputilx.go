@@ -1,11 +1,10 @@
 // Package httputilx provides HTTP utility functions.
-package httputilx // import "github.com/teamwork/utils/httputilx"
+package httputilx // import "github.com/teamwork/utils/v2/httputilx"
 
 import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -14,7 +13,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/teamwork/utils/ioutilx"
+	"github.com/teamwork/utils/v2/ioutilx"
 )
 
 // DumpBody reads the body of a HTTP request without consuming it, so it can be
@@ -88,7 +87,7 @@ func Fetch(url string) ([]byte, error) {
 
 	// TODO: Maybe add sanity check to bail out of the Content-Length is very
 	// large?
-	data, err := ioutil.ReadAll(response.Body)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot read body of %v", url)
 	}

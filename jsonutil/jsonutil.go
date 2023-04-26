@@ -1,5 +1,5 @@
 // Package jsonutil provides functions for working with JSON.
-package jsonutil // import "github.com/teamwork/utils/jsonutil"
+package jsonutil // import "github.com/teamwork/utils/v2/jsonutil"
 
 import "encoding/json"
 
@@ -34,7 +34,7 @@ func MustUnmarshal(data []byte, v interface{}) {
 //
 // The data will be unmarshalled in to v, which must be a pointer. Example:
 //
-//   Indent(`{"a": "b"}`, &map[string]string{}, "", "  ")
+//	Indent(`{"a": "b"}`, &map[string]string{}, "", "  ")
 func Indent(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
 	err := json.Unmarshal(data, v)
 	if err != nil {

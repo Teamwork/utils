@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -164,7 +163,7 @@ func TestDumpBody(t *testing.T) {
 				}
 				switch b := tc.Body.(type) {
 				case []byte:
-					tc.Req.Body = ioutil.NopCloser(bytes.NewReader(b))
+					tc.Req.Body = io.NopCloser(bytes.NewReader(b))
 				case func() io.ReadCloser:
 					tc.Req.Body = b()
 				default:
@@ -222,8 +221,4 @@ func TestFetch(t *testing.T) {
 			}
 		})
 	}
-}
-
-// TODO: Add test.
-func TestSave(t *testing.T) {
 }

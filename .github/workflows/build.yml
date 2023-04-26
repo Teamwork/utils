@@ -1,0 +1,43 @@
+name: Build
+on:
+  [push, pull_request]
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          only-new-issues: true
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GORACE: history_size=4
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Test
+        run: |
+          go test -v -coverprofile=full_coverage -race -count=1 ./...
+          echo 'mode: atomic' > full.coverage
+          awk 'FNR>1' *_coverage >> full.coverage
+
+      - name: Install goveralls
+        if: success()
+        run: go mod vendor && go install ./vendor/github.com/mattn/goveralls
+
+      - name: Upload
+        if: success()
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goveralls -coverprofile=full.coverage -service=github

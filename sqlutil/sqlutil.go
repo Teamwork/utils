@@ -1,5 +1,5 @@
 // Package sqlutil provides some helpers for SQL databases.
-package sqlutil // import "github.com/teamwork/utils/sqlutil"
+package sqlutil // import "github.com/teamwork/utils/v2/sqlutil"
 
 import (
 	"database/sql/driver"
@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/teamwork/utils/sliceutil"
+	"github.com/teamwork/utils/v2/sliceutil"
 )
 
 // IntList expands comma-separated values from a column to []int64, and stores
@@ -19,7 +19,7 @@ type IntList []int64
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l IntList) Value() (driver.Value, error) {
-	return sliceutil.JoinInt(l), nil
+	return sliceutil.Join(l), nil
 }
 
 // Scan converts the data returned from the DB into the struct.
@@ -55,7 +55,7 @@ type StringList []string
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l StringList) Value() (driver.Value, error) {
-	return strings.Join(sliceutil.FilterString(l, sliceutil.FilterStringEmpty), ","), nil
+	return strings.Join(sliceutil.Filter(l, sliceutil.FilterEmpty[string]), ","), nil
 }
 
 // Scan converts the data returned from the DB into the struct.
@@ -78,10 +78,10 @@ func (l *StringList) Scan(v interface{}) error {
 // Bool add the capability to handle more column types than the usual sql
 // driver. The following types are supported when reading the data:
 //
-//     * int64 and float64 - 0 for false, true otherwise
-//     * bool
-//     * []byte and string - "1" or "true" for true, and "0" or "false" for false. Also handles the 1 bit cases.
-//     * nil - defaults to false
+//   - int64 and float64 - 0 for false, true otherwise
+//   - bool
+//   - []byte and string - "1" or "true" for true, and "0" or "false" for false. Also handles the 1 bit cases.
+//   - nil - defaults to false
 //
 // It is also prepared to be encoded and decoded to a human readable format.
 type Bool bool

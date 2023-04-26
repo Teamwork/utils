@@ -1,3 +1,5 @@
 /vendor
 /coverage.txt
 .DS_Store
+full.coverage
+full_coverage

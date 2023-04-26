@@ -2,7 +2,7 @@ package imageutil
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"testing"
@@ -34,7 +34,7 @@ func TestDetectImageStream(t *testing.T) {
 	}
 
 	// No Tell() in Go? Hmm. Just compare data to see if Seek() worked.
-	d, _ := ioutil.ReadAll(fp)
+	d, _ := io.ReadAll(fp)
 	if !reflect.DeepEqual(d, image.JPEG) {
 		t.Errorf("read data wrong; first 20 bytes:\nwant: %#v\ngot:  %#v",
 			image.JPEG[:19], d[:19])

@@ -8,13 +8,12 @@ package ioutilx
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/teamwork/utils/sliceutil"
+	"github.com/teamwork/utils/v2/sliceutil"
 )
 
 // ErrSameFile is used when the source and destination file are the same file.
@@ -290,9 +289,9 @@ var DefaultCopyTreeOptions = &CopyTreeOptions{
 //
 // The optional ignore argument is a callable. If given, it is called with the
 // `src` parameter, which is the directory being visited by CopyTree(), and
-// `names` which is the list of `src` contents, as returned by ioutil.ReadDir():
+// `names` which is the list of `src` contents, as returned by os.ReadDir():
 //
-//   callable(src, entries) -> ignoredNames
+//	callable(src, entries) -> ignoredNames
 //
 // Since CopyTree() is called recursively, the callable will be called once for
 // each directory that is copied. It returns a list of names relative to the
@@ -320,9 +319,15 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		return &ErrExists{dst}
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return errors.Wrapf(err, "could not read %v", src)
+	}
+	fileInfos := make([]os.FileInfo, 0)
+	for _, entry := range entries {
+		if info, err := entry.Info(); err != nil {
+			fileInfos = append(fileInfos, info)
+		}
 	}
 
 	// Create dst.
@@ -332,11 +337,11 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 
 	ignoredNames := []string{}
 	if options.Ignore != nil {
-		ignoredNames = options.Ignore(src, entries)
+		ignoredNames = options.Ignore(src, fileInfos)
 	}
 
 	for _, entry := range entries {
-		if sliceutil.InStringSlice(ignoredNames, entry.Name()) {
+		if sliceutil.Contains(ignoredNames, entry.Name()) {
 			continue
 		}
 

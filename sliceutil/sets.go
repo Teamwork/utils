@@ -2,20 +2,20 @@ package sliceutil
 
 // Difference returns a new slice with elements that are in "set" but not in
 // "others".
-func Difference(set []int64, others ...[]int64) []int64 {
-	out := []int64{}
+func Difference[T comparable](set []T, others ...[]T) []T {
+	out := []T{}
 
-	for _, setItem := range set {
-		found := false
+	for _, item := range set {
+		var found bool
 		for _, o := range others {
-			if InInt64Slice(o, setItem) {
+			if Contains(o, item) {
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			out = append(out, setItem)
+			out = append(out, item)
 		}
 	}
 
@@ -26,15 +26,15 @@ func Difference(set []int64, others ...[]int64) []int64 {
 // value will contain elements that are only in "a" (and not in "b"), and the
 // second return value will contain elements that are only in "b" (and not in
 // "a").
-func Complement(a, b []int64) (aOnly, bOnly []int64) {
+func Complement[T comparable](a, b []T) (aOnly, bOnly []T) {
 	for _, i := range a {
-		if !InInt64Slice(b, i) {
+		if !Contains(b, i) {
 			aOnly = append(aOnly, i)
 		}
 	}
 
 	for _, i := range b {
-		if !InInt64Slice(a, i) {
+		if !Contains(a, i) {
 			bOnly = append(bOnly, i)
 		}
 	}
@@ -43,9 +43,9 @@ func Complement(a, b []int64) (aOnly, bOnly []int64) {
 }
 
 // Intersection returns the elements common to both a and b
-func Intersection(a, b []int64) []int64 {
-	inter := []int64{}
-	hash := make(map[int64]bool, len(a))
+func Intersection[T comparable](a, b []T) []T {
+	inter := []T{}
+	hash := make(map[T]bool, len(a))
 	for _, i := range a {
 		hash[i] = false
 	}

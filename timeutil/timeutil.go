@@ -1,4 +1,5 @@
-package timeutil // import "github.com/teamwork/utils/timeutil"
+// Package timeutil provides functions for working with time.
+package timeutil // import "github.com/teamwork/utils/v2/timeutil"
 
 import "time"
 
@@ -37,7 +38,8 @@ func FormatAsZulu(t time.Time) string {
 // date. The number of months is always rounded down, with a minimal value of 1.
 //
 // For example this returns 2:
-//     MonthsTo(time.Now().Add(24 * time.Hour * 70))
+//
+//	MonthsTo(time.Now().Add(24 * time.Hour * 70))
 //
 // Dates in the past are not supported, and their behaviour is undefined!
 func MonthsTo(a time.Time) int {

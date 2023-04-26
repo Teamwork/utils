@@ -3,7 +3,6 @@ package goutil
 import (
 	"fmt"
 	"go/ast"
-	"go/build"
 	"go/token"
 	"reflect"
 	"sort"
@@ -11,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/teamwork/test"
+	"golang.org/x/tools/go/packages"
 )
 
 // This also tests ResolvePackage() and ResolveWildcard().
@@ -39,79 +39,76 @@ func TestExpand(t *testing.T) {
 			[]string{"net/..."},
 			[]string{"net", "net/http", "net/http/cgi", "net/http/cookiejar",
 				"net/http/fcgi", "net/http/httptest", "net/http/httptrace",
-				"net/http/httputil", "net/http/internal", "net/http/pprof",
-				"net/internal/socktest", "net/mail", "net/rpc", "net/rpc/jsonrpc",
+				"net/http/httputil", "net/http/internal", "net/http/internal/ascii",
+				"net/http/internal/testcert", "net/http/pprof",
+				"net/internal/socktest", "net/mail", "net/netip", "net/rpc", "net/rpc/jsonrpc",
 				"net/smtp", "net/textproto", "net/url",
 			},
 			"",
 		},
 		{
-			[]string{"github.com/teamwork/utils"},
-			[]string{"github.com/teamwork/utils"},
+			[]string{"github.com/teamwork/utils/v2"},
+			[]string{"github.com/teamwork/utils/v2"},
 			"",
 		},
 		{
 			[]string{"."},
-			[]string{"github.com/teamwork/utils/goutil"},
+			[]string{"github.com/teamwork/utils/v2/goutil"},
+			"",
+		},
+		{
+			[]string{""},
+			[]string{"github.com/teamwork/utils/v2/goutil"},
 			"",
 		},
 		{
 			[]string{".."},
-			[]string{"github.com/teamwork/utils"},
+			[]string{"github.com/teamwork/utils/v2"},
 			"",
 		},
 		{
 			[]string{"../..."},
 			[]string{
-				"github.com/teamwork/utils",
-				"github.com/teamwork/utils/aesutil",
-				"github.com/teamwork/utils/dbg",
-				"github.com/teamwork/utils/errorutil",
-				"github.com/teamwork/utils/goutil",
-				"github.com/teamwork/utils/httputilx",
-				"github.com/teamwork/utils/httputilx/header",
-				"github.com/teamwork/utils/imageutil",
-				"github.com/teamwork/utils/ioutilx",
-				"github.com/teamwork/utils/jsonutil",
-				"github.com/teamwork/utils/maputil",
-				"github.com/teamwork/utils/mathutil",
-				"github.com/teamwork/utils/netutil",
-				"github.com/teamwork/utils/raceutil",
-				"github.com/teamwork/utils/sliceutil",
-				"github.com/teamwork/utils/sqlutil",
-				"github.com/teamwork/utils/stringutil",
-				"github.com/teamwork/utils/syncutil",
-				"github.com/teamwork/utils/timeutil",
+				"github.com/teamwork/utils/v2",
+				"github.com/teamwork/utils/v2/aesutil",
+				"github.com/teamwork/utils/v2/dbg",
+				"github.com/teamwork/utils/v2/errorutil",
+				"github.com/teamwork/utils/v2/goutil",
+				"github.com/teamwork/utils/v2/httputilx",
+				"github.com/teamwork/utils/v2/httputilx/header",
+				"github.com/teamwork/utils/v2/imageutil",
+				"github.com/teamwork/utils/v2/ioutilx",
+				"github.com/teamwork/utils/v2/jsonutil",
+				"github.com/teamwork/utils/v2/maputil",
+				"github.com/teamwork/utils/v2/mathutil",
+				"github.com/teamwork/utils/v2/netutil",
+				"github.com/teamwork/utils/v2/ptrutil",
+				"github.com/teamwork/utils/v2/raceutil",
+				"github.com/teamwork/utils/v2/sliceutil",
+				"github.com/teamwork/utils/v2/sqlutil",
+				"github.com/teamwork/utils/v2/stringutil",
+				"github.com/teamwork/utils/v2/syncutil",
+				"github.com/teamwork/utils/v2/timeutil",
 			},
 			"",
 		},
 
 		// Errors
 		{
-			[]string{""},
-			nil,
-			"cannot resolve empty string",
-		},
-		{
-			[]string{"thi.s/will/never/exist"},
-			nil,
-			`cannot find module providing package thi.s/will/never/exist`,
-		},
-		{
 			[]string{"thi.s/will/never/exist/..."},
 			nil,
-			`cannot find module providing package thi.s/will/never/exist`,
+			`cannot find package`,
 		},
 		{
 			[]string{"./doesnt/exist"},
 			nil,
-			"cannot find package",
+			"directory not found",
 		},
 	}
 
 	for i, tc := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out, err := Expand(tc.in, build.FindOnly)
+			out, err := Expand(tc.in, packages.NeedName)
 			if !test.ErrorContains(err, tc.wantErr) {
 				t.Fatal(err)
 			}
@@ -119,7 +116,7 @@ func TestExpand(t *testing.T) {
 			sort.Strings(tc.want)
 			var outPkgs []string
 			for _, p := range out {
-				outPkgs = append(outPkgs, p.ImportPath)
+				outPkgs = append(outPkgs, p.PkgPath)
 			}
 
 			if !reflect.DeepEqual(tc.want, outPkgs) {

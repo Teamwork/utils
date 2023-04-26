@@ -23,13 +23,8 @@ func DetectImage(data []byte) string {
 		data = data[:sniffLen]
 	}
 
-	// Index of the first non-whitespace byte in data.
-	firstNonWS := 0
-	//for ; firstNonWS < len(data) && isWS(data[firstNonWS]); firstNonWS++ {
-	//}
-
 	for _, sig := range sniffSignatures {
-		if ct := sig.match(data, firstNonWS); ct != "" {
+		if ct := sig.match(data); ct != "" {
 			return ct
 		}
 	}
@@ -59,7 +54,7 @@ func DetectImageStream(fp io.ReadSeeker) (string, error) {
 
 type sniffSig interface {
 	// match returns the MIME type of the data, or "" if unknown.
-	match(data []byte, firstNonWS int) string
+	match(data []byte) string
 }
 
 // Data matching the table in section 6.
@@ -82,7 +77,7 @@ type exactSig struct {
 	ct  string
 }
 
-func (e *exactSig) match(data []byte, firstNonWS int) string {
+func (e *exactSig) match(data []byte) string {
 	if bytes.HasPrefix(data, e.sig) {
 		return e.ct
 	}
@@ -91,17 +86,13 @@ func (e *exactSig) match(data []byte, firstNonWS int) string {
 
 type maskedSig struct {
 	mask, pat []byte
-	//skipWS    bool
-	ct string
+	ct        string
 }
 
-func (m *maskedSig) match(data []byte, firstNonWS int) string {
+func (m *maskedSig) match(data []byte) string {
 	// pattern matching algorithm section 6
 	// https://mimesniff.spec.whatwg.org/#pattern-matching-algorithm
 
-	//if m.skipWS {
-	//	data = data[firstNonWS:]
-	//}
 	if len(m.pat) != len(m.mask) {
 		return ""
 	}

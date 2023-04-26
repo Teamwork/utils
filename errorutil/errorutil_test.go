@@ -1,7 +1,7 @@
 package errorutil
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -14,6 +14,7 @@ func TestFilterExclude(t *testing.T) {
 	err = FilterTrace(err, FilterPattern(FilterTraceExclude,
 		"testing",
 		"re:.*github.com/teamwork/utils/.*",
+		"re:.*runtime/*.s",
 	))
 
 	tErr, _ := err.(stackTracer)
@@ -48,8 +49,8 @@ func TestFilterInclude(t *testing.T) {
 		"re:.*github.com/teamwork/utils/.*"))
 
 	tErr, _ := err.(stackTracer)
-	if len(tErr.StackTrace()) != 1 {
-		t.Errorf("wrong length for stack trace: %d; wanted 1", len(tErr.StackTrace()))
+	if len(tErr.StackTrace()) != 3 {
+		t.Errorf("wrong length for stack trace: %d; wanted 3", len(tErr.StackTrace()))
 		for _, f := range tErr.StackTrace() {
 			t.Logf("%+v\n", f)
 		}
@@ -70,6 +71,6 @@ func makeErr() error {
 }
 
 func zxc() error {
-	_, err := ioutil.ReadFile("/var/empty/nonexistent")
+	_, err := os.ReadFile("/var/empty/nonexistent")
 	return errors.Wrap(err, "could not read")
 }
