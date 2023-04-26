@@ -1,4 +1,4 @@
-package syncmap
+package syncutil
 
 import "sync"
 
