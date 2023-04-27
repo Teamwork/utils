@@ -227,7 +227,7 @@ func TestTagName(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			f := &ast.Field{
-				Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
+				Names: []*ast.Ident{{Name: "Original"}},
 				Tag:   &ast.BasicLit{Value: fmt.Sprintf("`%v`", tc.in)}}
 
 			out := TagName(f, tc.inName)
@@ -239,7 +239,7 @@ func TestTagName(t *testing.T) {
 
 	t.Run("nil", func(t *testing.T) {
 		f := &ast.Field{
-			Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
+			Names: []*ast.Ident{{Name: "Original"}},
 		}
 
 		out := TagName(f, "json")
@@ -260,8 +260,8 @@ func TestTagName(t *testing.T) {
 		}()
 
 		f := &ast.Field{
-			Names: []*ast.Ident{&ast.Ident{Name: "Original"},
-				&ast.Ident{Name: "Second"}}}
+			Names: []*ast.Ident{{Name: "Original"},
+				{Name: "Second"}}}
 		_ = TagName(f, "json")
 	})
 
