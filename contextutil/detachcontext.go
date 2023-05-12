@@ -11,22 +11,23 @@ type detachedContext struct {
 	ctx context.Context
 }
 
-// Deadline returns the time when work done on behalf of this context
-// should be canceled. In a detached context, it will always return false.
+// Deadline returns a zeroed time and false.
+// Refer to `context.Context.Deadline` for an explanation of what `Deadline`
+// usually does.
 func (d detachedContext) Deadline() (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// Done returns a nil channel always.
+// Done always returns a nil channel.
+// Refer to `context.Context.Done` for an explanation of what `Done`
+// usually does.
 func (d detachedContext) Done() <-chan struct{} {
 	return nil
 }
 
-// If Done is not yet closed, Err returns nil.
-// If Done is closed, Err returns a non-nil error explaining why:
-// Canceled if the context was canceled
-// or DeadlineExceeded if the context's deadline passed.
-// In a detached context, it will always return false.
+// Err always returns nil.
+// Refer to `context.Context.Err` for an explanation of what `Err`
+// usually does.
 func (d detachedContext) Err() error {
 	return nil
 }
