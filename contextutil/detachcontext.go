@@ -1,4 +1,4 @@
-package syncutil
+package contextutil
 
 import (
 	"context"
@@ -11,6 +11,7 @@ type detachedContext struct {
 }
 
 // Deadline returns the time when work done on behalf of this context
+// should be canceled. In a detached context, it will always return false.
 func (d detachedContext) Deadline() (time.Time, bool) {
 	return time.Time{}, false
 }
@@ -20,12 +21,18 @@ func (d detachedContext) Done() <-chan struct{} {
 	return nil
 }
 
-// Err returns nil always.
+// If Done is not yet closed, Err returns nil.
+// If Done is closed, Err returns a non-nil error explaining why:
+// Canceled if the context was canceled
+// or DeadlineExceeded if the context's deadline passed.
+// In a detached context, it will always return false.
 func (d detachedContext) Err() error {
 	return nil
 }
 
-// Value returns the value associated with this context for key, or nil if no
+// Value returns the value associated with this context for key, or nil
+// if no value is associated with key. Successive calls to Value with
+// the same key returns the same result.
 func (d detachedContext) Value(key interface{}) interface{} {
 	return d.ctx.Value(key)
 }

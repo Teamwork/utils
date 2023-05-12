@@ -1,6 +1,8 @@
 package syncutil
 
-import "sync"
+import (
+	"sync"
+)
 
 // Map a generic sync map.
 type Map[K comparable, V any] struct {
