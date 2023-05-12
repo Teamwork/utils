@@ -1,4 +1,5 @@
-package contextutil
+// Package contextutil adds functions for context.
+package contextutil // import "github.com/teamwork/utils/v2/contextutil"
 
 import (
 	"context"
