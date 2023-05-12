@@ -7,6 +7,7 @@ import (
 )
 
 func TestMap_Store(t *testing.T) {
+	t.Parallel()
 	tests := map[string]int{
 		"hello": 4,
 		"world": 7,
@@ -34,6 +35,7 @@ func TestMap_Store(t *testing.T) {
 }
 
 func TestMap_Store_Concurrent(t *testing.T) {
+	t.Parallel()
 	m := syncutil.NewMap[string, int]()
 	for i := 0; i < 10000; i++ {
 		i := i
@@ -44,6 +46,7 @@ func TestMap_Store_Concurrent(t *testing.T) {
 }
 
 func TestMap_Range(t *testing.T) {
+	t.Parallel()
 	base := map[string]int{
 		"hello":    1,
 		"world":    2,
@@ -85,6 +88,7 @@ func TestMap_Range(t *testing.T) {
 }
 
 func TestMap_Range_EarlyReturn(t *testing.T) {
+	t.Parallel()
 	m := syncutil.NewMap[string, int]()
 	m.Store("test", 1)
 	m.Store("wow", 2)

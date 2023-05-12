@@ -9,6 +9,7 @@ import (
 )
 
 func TestDetach(t *testing.T) {
+	t.Parallel()
 	type myCoolKey struct{}
 
 	pCtx := context.WithValue(context.Background(), myCoolKey{}, 56)
