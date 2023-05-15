@@ -71,6 +71,7 @@ func TestExpand(t *testing.T) {
 			[]string{
 				"github.com/teamwork/utils/v2",
 				"github.com/teamwork/utils/v2/aesutil",
+				"github.com/teamwork/utils/v2/contextutil",
 				"github.com/teamwork/utils/v2/dbg",
 				"github.com/teamwork/utils/v2/errorutil",
 				"github.com/teamwork/utils/v2/goutil",
