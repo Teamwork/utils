@@ -40,6 +40,35 @@ func TestJoin(t *testing.T) {
 	}
 }
 
+func TestJoinWith(t *testing.T) {
+	cases := []struct {
+		in       []int64
+		expected string
+	}{
+		{
+			[]int64{1, 2, 3, 4, 4, 5, 6, 6, 6, 6, 7, 8, 8, 8},
+			"1 || 2 || 3 || 4 || 4 || 5 || 6 || 6 || 6 || 6 || 7 || 8 || 8 || 8",
+		},
+		{
+			[]int64{-1, -2, -3, -4, -4, -5, -6, -6, -6, -6, -7, -8, -8, -8},
+			"-1 || -2 || -3 || -4 || -4 || -5 || -6 || -6 || -6 || -6 || -7 || -8 || -8 || -8",
+		},
+		{
+			[]int64{},
+			"",
+		},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := JoinWith(tc.in, " || ")
+			if got != tc.expected {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
 func TestUniq_Int64(t *testing.T) {
 	cases := []struct {
 		in       []int64
