@@ -298,7 +298,7 @@ func TestCopyTree(t *testing.T) {
 	})
 	t.Run("permission", func(t *testing.T) {
 		err := CopyTree("test", "/cant/write/here", nil)
-		if !test.ErrorContains(err, "permission denied") {
+		if !test.ErrorContains(err, "permission denied") && !test.ErrorContains(err, "read-only file system") {
 			t.Error(err)
 		}
 	})
