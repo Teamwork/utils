@@ -90,6 +90,7 @@ func TestExpand(t *testing.T) {
 				"github.com/teamwork/utils/v2/stringutil",
 				"github.com/teamwork/utils/v2/syncutil",
 				"github.com/teamwork/utils/v2/timeutil",
+				"github.com/teamwork/utils/v2/typeutil",
 			},
 			"",
 		},
