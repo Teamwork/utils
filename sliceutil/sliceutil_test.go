@@ -621,3 +621,44 @@ func TestInterfaceSliceTo(t *testing.T) {
 		}
 	}
 }
+
+func TestValues(t *testing.T) {
+	type testStruct struct {
+		Name string
+		Age  int
+	}
+
+	cases := []struct {
+		in       []testStruct
+		expected []string
+	}{
+		{
+			[]testStruct{
+				{Name: "a", Age: 1},
+				{Name: "b", Age: 2},
+				{Name: "c", Age: 3},
+			},
+			[]string{"a", "b", "c"},
+		},
+		{
+			[]testStruct{
+				{Name: "a", Age: 1},
+				{Name: "b", Age: 2},
+				{Name: "c", Age: 3},
+				{Name: "d", Age: 4},
+			},
+			[]string{"a", "b", "c", "d"},
+		},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := Values(tc.in, func(t testStruct) string {
+				return t.Name
+			})
+			if !reflect.DeepEqual(got, tc.expected) {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
