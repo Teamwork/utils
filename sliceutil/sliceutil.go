@@ -191,3 +191,13 @@ func InterfaceSliceTo(src []interface{}, dst interface{}) interface{} {
 
 	return dstV.Interface()
 }
+
+// Values returns a list of items extracted from T, see test file for example
+func Values[T comparable, N any](tt []T, fn func(T) N) []N {
+	ret := make([]N, len(tt))
+	for i, t := range tt {
+		ret[i] = fn(t)
+	}
+
+	return ret
+}
