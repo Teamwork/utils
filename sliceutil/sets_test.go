@@ -155,6 +155,37 @@ func TestIntersection(t *testing.T) {
 	}
 }
 
+func TestIntersectionOfMany(t *testing.T) {
+	type ciTest struct {
+		name   string
+		a      []int64
+		b      []int64
+		c      []int64
+		result []int64
+	}
+	tests := []ciTest{
+		{
+			name:   "EmptyLists",
+			result: []int64{},
+		}, {
+			name:   "three",
+			a:      []int64{1, 2, 3},
+			b:      []int64{3},
+			c:      []int64{3, 4, 5},
+			result: []int64{3},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := IntersectionOfMany(test.a, test.b)
+
+			if !reflect.DeepEqual(result, test.result) {
+				t.Errorf("result wrong\ngot:  %#v\nwant: %#v\n", result, test.result)
+			}
+		})
+	}
+}
+
 func BenchmarkComplement_equal(b *testing.B) {
 	listA := []int64{1, 2, 3}
 	listB := []int64{1, 2, 3}
