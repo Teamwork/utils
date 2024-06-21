@@ -167,7 +167,8 @@ func TestIntersectionOfMany(t *testing.T) {
 		{
 			name:   "EmptyLists",
 			result: []int64{},
-		}, {
+		},
+		{
 			name:   "three",
 			a:      []int64{1, 2, 3},
 			b:      []int64{3},
