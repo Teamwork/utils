@@ -37,6 +37,7 @@ func TestRoundPlus(t *testing.T) {
 		{123.555555, 3, 123.556},
 		{123.558, 2, 123.56},
 		{-123.555555, 3, -123.556},
+		{123.233333, 2, 123.23},
 	}
 
 	for _, c := range cases {
@@ -46,6 +47,27 @@ func TestRoundPlus(t *testing.T) {
 		}
 	}
 
+}
+
+func TestCeilPlus(t *testing.T) {
+	cases := []struct {
+		in        float64
+		precision int
+		want      float64
+	}{
+		{123.554999, 3, 123.555},
+		{123.555555, 3, 123.556},
+		{123.558, 2, 123.56},
+		{-123.555555, 3, -123.555},
+		{123.233333, 2, 123.24},
+	}
+
+	for _, c := range cases {
+		got := CeilPlus(c.in, c.precision)
+		if got != c.want {
+			t.Errorf("Round(%f) => %f, want %f", c.in, got, c.want)
+		}
+	}
 }
 
 func TestIsSignedZero(t *testing.T) {
