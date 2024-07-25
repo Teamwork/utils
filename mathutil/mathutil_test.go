@@ -65,7 +65,7 @@ func TestCeilPlus(t *testing.T) {
 	for _, c := range cases {
 		got := CeilPlus(c.in, c.precision)
 		if got != c.want {
-			t.Errorf("Round(%f) => %f, want %f", c.in, got, c.want)
+			t.Errorf("CeilPlus(%f) => %f, want %f", c.in, got, c.want)
 		}
 	}
 }
