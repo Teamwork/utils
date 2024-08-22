@@ -34,7 +34,7 @@ func TestJoin(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Join(tc.in)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -77,7 +77,7 @@ func TestJoinWith(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := JoinWith(tc.in, tc.delim)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -114,7 +114,7 @@ func TestUniq_Int64(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Unique(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -139,7 +139,7 @@ func TestUniq_String(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Unique(tc.in)
 			if !stringslicesequal(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -165,7 +165,7 @@ func TestMergeUnique_Int64(t *testing.T) {
 			got := MergeUnique(tc.in)
 			if !int64slicesequal(got, tc.expected) {
 				t.Log("IN", tc.in)
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -274,11 +274,11 @@ func TestCSVtoInt64Slice(t *testing.T) {
 			}
 
 			if err != tc.expectedErr && err.Error() != tc.expectedErr.Error() {
-				t.Errorf(diff.Cmp(tc.expectedErr.Error(), err.Error()))
+				t.Error(diff.Cmp(tc.expectedErr.Error(), err.Error()))
 			}
 
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -301,7 +301,7 @@ func TestItemInSlice_String(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -326,7 +326,7 @@ func TestInFoldedStringSlice(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := InFoldedStringSlice(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -349,7 +349,7 @@ func TestItemInSlice_Int(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -372,7 +372,7 @@ func TestItemInSlice_Int64(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Contains(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}
@@ -657,7 +657,7 @@ func TestValues(t *testing.T) {
 				return t.Name
 			})
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}

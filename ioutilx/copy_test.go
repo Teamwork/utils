@@ -312,7 +312,7 @@ func TestCopyTree(t *testing.T) {
 
 	err := CopyTree("test", "test_copytree", &CopyTreeOptions{
 		Symlinks: false,
-		Ignore: func(path string, fi []os.FileInfo) []string {
+		Ignore: func(_ string, _ []os.FileInfo) []string {
 			return []string{"fifo"}
 		},
 		CopyFunction:           Copy,

@@ -76,7 +76,7 @@ func TestMustUnmarshal(t *testing.T) {
 		defer func() {
 			rec := recover()
 			if rec == nil {
-				t.Errorf("no panic?")
+				t.Error("no panic?")
 			}
 		}()
 
