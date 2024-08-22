@@ -18,13 +18,13 @@ func TestInvalidKeysAndData(t *testing.T) {
 	data := []byte(testPlaintext)
 	_, err := Encrypt("", data)
 	if err == nil {
-		t.Errorf("Encrypt succeeded with an empty key")
+		t.Error("Encrypt succeeded with an empty key")
 	}
 
 	// Decrypt with empty key
 	_, err = Decrypt("", testCiphertext)
 	if err == nil {
-		t.Errorf("Decrypt succeeded with an empty key")
+		t.Error("Decrypt succeeded with an empty key")
 	}
 
 	// Decrypt with an incorrect key
@@ -48,13 +48,13 @@ func TestInvalidKeysAndData(t *testing.T) {
 	// Decrypt an short string (i.e. smaller than block size)
 	_, err = Decrypt(testKeyString, "aaaabbbbcccc")
 	if err == nil {
-		t.Errorf("Decrypt succeeded with an invalid key size")
+		t.Error("Decrypt succeeded with an invalid key size")
 	}
 
 	// Decrypt a non-base64 string
 	_, err = Decrypt(testKeyString, fmt.Sprintf("%s#@?`", testCiphertext))
 	if err == nil {
-		t.Errorf("Decrypt succeeded with an invalid base64 string")
+		t.Error("Decrypt succeeded with an invalid base64 string")
 	}
 }
 
@@ -87,7 +87,7 @@ func TestEncryptAndDecrypt(t *testing.T) {
 				t.Fatal("Decrypt failed, plaintext result is nil")
 			}
 			if string(plain) != testData {
-				t.Fatalf(diff.Cmp(testData, string(plain)))
+				t.Fatal(diff.Cmp(testData, string(plain)))
 			}
 		})
 	}

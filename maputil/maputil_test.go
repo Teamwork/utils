@@ -21,7 +21,7 @@ func TestSwap(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Swap(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Error(diff.Cmp(tc.expected, got))
 			}
 		})
 	}

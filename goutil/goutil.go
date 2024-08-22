@@ -96,7 +96,7 @@ func ResolveWildcard(path string, mode build.ImportMode) ([]*build.Package, erro
 
 	// Gather a list of directories with *.go files.
 	goDirs := make(map[string]struct{})
-	err = filepath.Walk(root.Dir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(root.Dir, func(path string, info os.FileInfo, _ error) error {
 		if !strings.HasSuffix(path, ".go") || info.IsDir() || strings.Contains(path, "/vendor/") {
 			return nil
 		}

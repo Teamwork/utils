@@ -65,7 +65,7 @@ func TestMap_Range(t *testing.T) {
 		m.Store(k, v)
 	}
 
-	m.Range(func(k string, v int) bool {
+	m.Range(func(k string, _ int) bool {
 		seen, ok := test[k]
 		if !ok {
 			t.Fatalf("unexpected key '%s'", k)
@@ -95,7 +95,7 @@ func TestMap_Range_EarlyReturn(t *testing.T) {
 
 	var count int
 
-	m.Range(func(k string, v int) bool {
+	m.Range(func(_ string, _ int) bool {
 		count++
 		return false
 	})
