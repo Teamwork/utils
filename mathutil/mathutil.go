@@ -24,6 +24,14 @@ func RoundPlus(f float64, precision int) float64 {
 	return Round(f*shift) / shift
 }
 
+// CeilPlus will ceil the value to the given precision.
+//
+// e.g. CeilPlus(123.233333, 2) will return 123.24
+func CeilPlus(f float64, precision int) float64 {
+	multiplier := math.Pow10(precision)
+	return math.Ceil(f*multiplier) / multiplier
+}
+
 // Min gets the lowest of two numbers.
 func Min(a, b int64) int64 {
 	if a > b {
