@@ -24,7 +24,7 @@ func TestDereference_Int(t *testing.T) {
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			if got := Dereference(test.ptr); got != test.expected {
-				t.Errorf(diff.Cmp(test.expected, got))
+				t.Error(diff.Cmp(test.expected, got))
 			}
 		})
 	}
@@ -47,7 +47,7 @@ func TestDereference_String(t *testing.T) {
 	for i, test := range tests {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			if got := Dereference(test.ptr); got != test.expected {
-				t.Errorf(diff.Cmp(test.expected, got))
+				t.Error(diff.Cmp(test.expected, got))
 			}
 		})
 	}
