@@ -307,6 +307,51 @@ func TestItemInSlice_String(t *testing.T) {
 	}
 }
 
+func TestContainsAny(t *testing.T) {
+	tests := []struct {
+		list     []string
+		find     string
+		find2    string
+		expected bool
+	}{
+		{[]string{"hello"}, "hello", "world", true},
+		{[]string{"hello"}, "hell", "world", false},
+		{[]string{"hello", "world", "test"}, "world", "potato", true},
+		{[]string{"hello", "world", "test"}, "", "potato", false},
+		{[]string{}, "", "", false},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := ContainsAny(tc.list, tc.find)
+			if got != tc.expected {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
+func TestIsSubset(t *testing.T) {
+	tests := []struct {
+		set      []int
+		subset   []int
+		expected bool
+	}{
+		{[]int{1, 2, 3, 4}, []int{2, 3}, true},
+		{[]int{1, 2, 3, 4}, []int{2, 3, 8}, false},
+		{[]int{1, 2, 3, 4}, []int{1, 2, 3, 4}, false},
+	}
+
+	for i, tc := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := IsSubset(tc.set, tc.subset)
+			if got != tc.expected {
+				t.Errorf(diff.Cmp(tc.expected, got))
+			}
+		})
+	}
+}
+
 func TestInFoldedStringSlice(t *testing.T) {
 	tests := []struct {
 		list     []string
