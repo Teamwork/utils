@@ -627,7 +627,7 @@ func TestToAnySlice(t *testing.T) {
 	out := ToAnySlice(in)
 	for i := range out {
 		if !reflect.DeepEqual(out[i], in[i]) {
-			t.Errorf("want %[1]v(%[1]T),\tgot %[2]v(%[2]T)", in[i], in[i])
+			t.Errorf("want %[1]v(%[1]T),\tgot %[2]v(%[2]T)", in[i], out[i])
 		}
 	}
 }
