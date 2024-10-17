@@ -622,6 +622,16 @@ func TestInterfaceSliceTo(t *testing.T) {
 	}
 }
 
+func TestToAnySlice(t *testing.T) {
+	in := []int{1, 2, 3, 4, 5}
+	out := ToAnySlice(in)
+	for i := range out {
+		if !reflect.DeepEqual(out[i], in[i]) {
+			t.Errorf("want %[1]v(%[1]T),\tgot %[2]v(%[2]T)", in[i], out[i])
+		}
+	}
+}
+
 func TestValues(t *testing.T) {
 	type testStruct struct {
 		Name string

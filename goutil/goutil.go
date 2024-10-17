@@ -1,4 +1,6 @@
 // Package goutil provides functions to work with Go source files.
+//
+//nolint:staticcheck
 package goutil // import "github.com/teamwork/utils/v2/goutil"
 
 import (
