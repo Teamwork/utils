@@ -1,5 +1,5 @@
 run:
-  deadline: 240s
+  timeout: 240s
   tests: true
 
 linters:
