@@ -255,6 +255,12 @@ start:
 		return t.Name
 	case *ast.SelectorExpr:
 		return t.Sel.Name
+	case *ast.IndexExpr:
+		f = t.X
+		goto start
+	case *ast.IndexListExpr:
+		f = t.X
+		goto start
 	default:
 		panic(fmt.Sprintf("can't get name for %#v", f))
 	}
