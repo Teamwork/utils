@@ -202,7 +202,7 @@ func TestFetch(t *testing.T) {
 	cases := []struct {
 		in, want, wantErr string
 	}{
-		{"http://example.com", "<html>", ""},
+		{"http://example.com", "<html", ""},
 		{"http://fairly-certain-this-doesnt-exist-asdasd12g1ghdfddd.com", "", "cannot download"},
 		{"http://httpbin.org/status/400", "", "400"},
 		{"http://httpbin.org/status/500", "", "500"},

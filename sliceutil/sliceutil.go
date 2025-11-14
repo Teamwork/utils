@@ -162,8 +162,8 @@ func FilterEmpty[T comparable](t T) bool {
 }
 
 // Map returns a list where each item in list has been modified by fn
-func Map[T comparable](tt []T, fn func(T) T) []T {
-	ret := make([]T, len(tt))
+func Map[InputTyp, OutputTyp any](tt []InputTyp, fn func(InputTyp) OutputTyp) []OutputTyp {
+	ret := make([]OutputTyp, len(tt))
 	for i, t := range tt {
 		ret[i] = fn(t)
 	}
@@ -171,9 +171,18 @@ func Map[T comparable](tt []T, fn func(T) T) []T {
 	return ret
 }
 
-// InterfaceSliceTo converts []interface to any given slice.
-// It will ~optimistically~ try to convert interface item to the dst item type
-func InterfaceSliceTo(src []interface{}, dst interface{}) interface{} {
+// Reduce returns an aggregation of tt
+func Reduce[InputTyp, AccTyp any](tt []InputTyp, fn func(AccTyp, InputTyp) AccTyp, acc AccTyp) AccTyp {
+	for _, t := range tt {
+		acc = fn(acc, t)
+	}
+
+	return acc
+}
+
+// InterfaceSliceTo converts []any to any given slice.
+// It will ~optimistically~ try to convert any item to the dst item type
+func InterfaceSliceTo(src []any, dst any) any {
 	dstt := reflect.TypeOf(dst)
 	if dstt.Kind() != reflect.Slice {
 		panic("`dst` is not an slice")

@@ -576,6 +576,72 @@ func TestMap_String(t *testing.T) {
 	}
 }
 
+func TestMap_Int(t *testing.T) {
+	cases := []struct {
+		in   []string
+		want []int
+		f    func(string) int
+	}{
+		{
+			in:   []string{"1", "5", "2"},
+			want: []int{1, 5, 2},
+			f: func(s string) int {
+				n, _ := strconv.Atoi(s) // notlint: errcheck
+				return n
+			},
+		},
+	}
+	for _, tc := range cases {
+		t.Run("", func(t *testing.T) {
+			out := Map(tc.in, tc.f)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestReduce_Int(t *testing.T) {
+	cases := []struct {
+		in   []int
+		want int64
+		f    func(int64, int) int64
+	}{
+		{
+			in:   []int{1, 5, 2},
+			want: 8,
+			f: func(acc int64, i int) int64 {
+				return acc + int64(i)
+			},
+		},
+	}
+	for _, tc := range cases {
+		t.Run("", func(t *testing.T) {
+			out := Reduce(tc.in, tc.f, 0)
+			if !reflect.DeepEqual(tc.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestReduce_Struct(t *testing.T) {
+	type Acc struct {
+		acc int
+	}
+
+	out := Reduce(
+		[]int{1, 2, 3},
+		func(out Acc, i int) Acc {
+			out.acc += i
+			return out
+		},
+		Acc{})
+	if out.acc != 6 {
+		t.Errorf("\nout:  %#v\nwant: %#v\n", out.acc, 6)
+	}
+}
+
 func TestInterfaceSliceTo(t *testing.T) {
 	{
 		src := []interface{}{"1", "2", "3", "4", "5"}
