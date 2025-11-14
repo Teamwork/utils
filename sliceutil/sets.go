@@ -57,3 +57,18 @@ func Intersection[T comparable](a, b []T) []T {
 	}
 	return inter
 }
+
+// IntersectionOfMany returns the elements common to all arguments
+func IntersectionOfMany[T comparable](slices ...[]T) []T {
+	var common []T
+	for i, s := range slices {
+		if i == 0 {
+			common = s
+		}
+		common = Intersection(common, s)
+		if len(common) == 0 {
+			break
+		}
+	}
+	return common
+}

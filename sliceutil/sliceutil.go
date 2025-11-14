@@ -93,6 +93,16 @@ func Contains[T comparable](tt []T, item T) bool {
 	return false
 }
 
+// ContainsAny checks if slice contain element
+func ContainsAny[T comparable](slice []T, elements ...T) bool {
+	for _, element := range elements {
+		if Contains(slice, element) {
+			return true
+		}
+	}
+	return false
+}
+
 // InFoldedStringSlice reports whether str is within list(case-insensitive)
 func InFoldedStringSlice(list []string, str string) bool {
 	for _, item := range list {
@@ -218,4 +228,18 @@ func Values[T comparable, N any](tt []T, fn func(T) N) []N {
 	}
 
 	return ret
+}
+
+// IsSubset returns if all elements of 'slice' are in 'set'
+func IsSubset[T comparable](slice, subset []T) bool {
+	subsetMap := make(map[T]bool, len(subset))
+	for _, v := range subset {
+		subsetMap[v] = true
+	}
+	for _, v := range slice {
+		if !subsetMap[v] {
+			return false
+		}
+	}
+	return true
 }
