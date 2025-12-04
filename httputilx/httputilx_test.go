@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/teamwork/test"
 )
@@ -218,6 +220,148 @@ func TestFetch(t *testing.T) {
 			}
 			if !strings.Contains(string(out), tc.want) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", string(out), tc.want)
+			}
+		})
+	}
+}
+
+func TestDoExponentialBackoff(t *testing.T) {
+	tests := []struct {
+		name         string
+		options      []ExponentialBackoffOption
+		handler      http.HandlerFunc
+		wantBody     string
+		wantErr      string
+		wantAttempts int
+	}{
+		{
+			name: "Success",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(3, 100*time.Millisecond, 5*time.Second, 2.0),
+			},
+			handler: func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte("ok"))
+			},
+			wantBody:     "ok",
+			wantErr:      "",
+			wantAttempts: 1,
+		},
+		{
+			name: "RetryOnError",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(3, 100*time.Millisecond, 5*time.Second, 2.0),
+			},
+			handler: func() http.HandlerFunc {
+				attempts := 0
+				return func(w http.ResponseWriter, _ *http.Request) {
+					attempts++
+					if attempts < 3 {
+						w.WriteHeader(http.StatusInternalServerError)
+						return
+					}
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte("success"))
+				}
+			}(),
+			wantBody:     "success",
+			wantErr:      "",
+			wantAttempts: 3,
+		},
+		{
+			name: "TooManyRequests",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(3, 100*time.Millisecond, 5*time.Second, 2.0),
+			},
+			handler: func() http.HandlerFunc {
+				attempts := 0
+				return func(w http.ResponseWriter, _ *http.Request) {
+					attempts++
+					if attempts < 2 {
+						w.WriteHeader(http.StatusTooManyRequests)
+						return
+					}
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte("done"))
+				}
+			}(),
+			wantBody:     "done",
+			wantErr:      "",
+			wantAttempts: 2,
+		},
+		{
+			name: "MaxRetriesExceeded",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(2, 100*time.Millisecond, 5*time.Second, 2.0),
+			},
+			handler: func() http.HandlerFunc {
+				return func(w http.ResponseWriter, _ *http.Request) {
+					w.WriteHeader(http.StatusInternalServerError)
+				}
+			}(),
+			wantBody:     "",
+			wantErr:      "",
+			wantAttempts: 3,
+		},
+		{
+			name: "CustomShouldRetry",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(2, 100*time.Millisecond, 5*time.Second, 2.0),
+				ExponentialBackoffWithShouldRetry(func(resp *http.Response, _ error) bool {
+					if resp != nil && resp.StatusCode == http.StatusBadRequest {
+						return true
+					}
+					return false
+				}),
+			},
+			handler: func() http.HandlerFunc {
+				return func(w http.ResponseWriter, _ *http.Request) {
+					w.WriteHeader(http.StatusBadRequest)
+				}
+			}(),
+			wantBody:     "",
+			wantErr:      "",
+			wantAttempts: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			attempts := 0
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				attempts++
+				tt.handler(w, r)
+			}))
+			defer ts.Close()
+
+			req, err := http.NewRequest(http.MethodGet, ts.URL, nil)
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+
+			resp, err := DoExponentialBackoff(req, tt.options...)
+			if err == nil {
+				defer resp.Body.Close() //nolint:errcheck
+			}
+			if tt.wantErr != "" {
+				if err == nil {
+					t.Errorf("expected error %q, got nil", tt.wantErr)
+				} else if !test.ErrorContains(err, tt.wantErr) {
+					t.Errorf("expected error %q, got %q", tt.wantErr, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				} else {
+					body, _ := io.ReadAll(resp.Body)
+					if tt.wantBody != string(body) {
+						t.Errorf("expected body %q, got %q", tt.wantBody, string(body))
+					}
+				}
+			}
+
+			if attempts != tt.wantAttempts {
+				t.Errorf("expected %d attempts, got %d", tt.wantAttempts, attempts)
 			}
 		})
 	}

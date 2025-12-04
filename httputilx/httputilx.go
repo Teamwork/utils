@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -144,4 +145,130 @@ func Save(url string, dir string, filename string) (string, error) {
 	}
 
 	return path, nil
+}
+
+// ExponentialBackoffOptions contains options for the exponential backoff retry
+// mechanism.
+type ExponentialBackoffOptions struct {
+	client            *http.Client
+	maxRetries        int
+	initialBackoff    time.Duration
+	maxBackoff        time.Duration
+	backoffMultiplier float64
+	shouldRetry       func(resp *http.Response, err error) bool
+	logger            *slog.Logger
+}
+
+// ExponentialBackoffOption is a function that configures
+// ExponentialBackoffOptions.
+type ExponentialBackoffOption func(*ExponentialBackoffOptions)
+
+// ExponentialBackoffWithClient sets the HTTP client to be used when sending the
+// API requests. By default, http.DefaultClient is used.
+func ExponentialBackoffWithClient(client *http.Client) ExponentialBackoffOption {
+	return func(o *ExponentialBackoffOptions) {
+		o.client = client
+	}
+}
+
+// ExponentialBackoffWithConfig sets the configuration for the exponential
+// backoff retry mechanism. By default, it will retry up to 3 times, starting
+// with a 100ms backoff, doubling each time up to a maximum of 5s.
+func ExponentialBackoffWithConfig(
+	maxRetries int,
+	initialBackoff, maxBackoff time.Duration,
+	backoffMultiplier float64,
+) ExponentialBackoffOption {
+	return func(o *ExponentialBackoffOptions) {
+		o.maxRetries = maxRetries
+		o.initialBackoff = initialBackoff
+		o.maxBackoff = maxBackoff
+		o.backoffMultiplier = backoffMultiplier
+	}
+}
+
+// ExponentialBackoffWithShouldRetry sets the function to determine whether a
+// request should be retried based on the response and error. By default, it
+// retries on any error, as well as on HTTP 5xx and 429 status codes.
+func ExponentialBackoffWithShouldRetry(
+	shouldRetry func(resp *http.Response, err error) bool,
+) ExponentialBackoffOption {
+	return func(o *ExponentialBackoffOptions) {
+		o.shouldRetry = shouldRetry
+	}
+}
+
+// ExponentialBackoffWithLogger sets the logger to be used for logging retry
+// attempts. By default, a no-op logger is used.
+func ExponentialBackoffWithLogger(logger *slog.Logger) ExponentialBackoffOption {
+	return func(o *ExponentialBackoffOptions) {
+		o.logger = logger
+	}
+}
+
+// DoExponentialBackoff will send an API request using exponential backoff until
+// it either succeeds or the maximum number of retries is reached.
+func DoExponentialBackoff(req *http.Request, options ...ExponentialBackoffOption) (*http.Response, error) {
+	o := ExponentialBackoffOptions{
+		client:            http.DefaultClient,
+		maxRetries:        3,
+		initialBackoff:    100 * time.Millisecond,
+		maxBackoff:        5 * time.Second,
+		backoffMultiplier: 2.0,
+		shouldRetry: func(resp *http.Response, err error) bool {
+			if err != nil {
+				return true
+			}
+			if resp.StatusCode == http.StatusTooManyRequests || resp.StatusCode >= 500 {
+				return true
+			}
+			return false
+		},
+		logger: slog.New(slog.DiscardHandler),
+	}
+	for _, option := range options {
+		option(&o)
+	}
+
+	backoff := o.initialBackoff
+
+	for attempt := 0; attempt <= o.maxRetries; attempt++ {
+		reqClone := req.Clone(req.Context())
+		if req.Body != nil {
+			if seeker, ok := req.Body.(interface {
+				Seek(int64, int) (int64, error)
+			}); ok {
+				_, _ = seeker.Seek(0, 0)
+			}
+			reqClone.Body = req.Body
+		}
+
+		resp, err := o.client.Do(reqClone)
+		if !o.shouldRetry(resp, err) || attempt >= o.maxRetries {
+			return resp, nil
+		}
+
+		logArgs := []any{
+			slog.Int("attempt", attempt+1),
+			slog.Duration("backoff", backoff),
+		}
+		if err != nil {
+			logArgs = append(logArgs, slog.String("error", err.Error()))
+		}
+		if resp != nil {
+			if err := resp.Body.Close(); err != nil {
+				o.logger.Error("failed to close response body",
+					slog.Int("attempt", attempt+1),
+					slog.String("error", err.Error()),
+				)
+			}
+			logArgs = append(logArgs, slog.Int("status_code", resp.StatusCode))
+		}
+
+		o.logger.Debug("request failed", logArgs...)
+		time.Sleep(backoff)
+		backoff = min(time.Duration(float64(backoff)*o.backoffMultiplier), o.maxBackoff)
+	}
+
+	return nil, fmt.Errorf("request failed after %d attempts", o.maxRetries+1)
 }
