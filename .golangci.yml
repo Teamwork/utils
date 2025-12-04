@@ -1,25 +1,35 @@
+version: "2"
 run:
-  timeout: 240s
   tests: true
-
 linters:
-  disable-all: true
+  default: none
   enable:
-    - govet
-    - revive
-    - unused
     - errcheck
-    - staticcheck
-    - ineffassign
-    - unconvert
-    - goimports
-    - misspell
-    - lll
-    - nakedret
     - gocritic
-
-linters-settings:
-  lll:
-    line-length: 240 # Exceptional case its usually 120
-issues:
-  exclude-use-default: false
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - revive
+    - staticcheck
+    - unconvert
+    - unused
+  settings:
+    revive:
+      rules:
+        - name: var-naming
+          disabled: true
+    staticcheck:
+      # Disable SA1019 (using deprecated code) as the existing use of CFB is
+      # required for backwards compatibility.
+      checks: ["all", "-SA1019"]
+    lll:
+      line-length: 240
+  exclusions:
+    generated: lax
+formatters:
+  enable:
+    - goimports
+  exclusions:
+    generated: lax

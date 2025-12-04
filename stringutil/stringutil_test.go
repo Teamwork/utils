@@ -109,10 +109,10 @@ func TestRemoveUnprintable(t *testing.T) {
 		want    string
 	}{
 		{"Hello, 世界", 0, "Hello, 世界"},
-		{"m", 1, "m"},
+		{"m\x19", 1, "m"},
 		{"m", 0, "m"},
-		{" ", 3, " "},
-		{"a‎b‏c", 6, "abc"}, // only 2 removed but count as 3 each
+		{" \x19\x08\x1f", 3, " "},
+		{"a\u200eb\u200fc", 6, "abc"}, // only 2 removed but count as 3 each
 	}
 
 	for i, tc := range cases {

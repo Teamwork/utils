@@ -107,11 +107,12 @@ func (b *Bool) Scan(src interface{}) error {
 		if raw, ok := v.([]byte); ok {
 			// handle the bit(1) column type
 			if len(raw) == 1 {
-				if raw[0] == 0x1 {
+				switch raw[0] {
+				case 0x1:
 					*b = true
 					return nil
 
-				} else if raw[0] == 0x0 {
+				case 0x0:
 					*b = false
 					return nil
 				}
@@ -168,11 +169,12 @@ func (b *Bool) UnmarshalText(text []byte) error {
 	}
 
 	normalized := strings.TrimSpace(strings.ToLower(string(text)))
-	if normalized == "true" || normalized == "1" || normalized == `"true"` { // nolint: gocritic
+	switch normalized {
+	case "true", "1", `"true"`:
 		*b = true
-	} else if normalized == "false" || normalized == "0" || normalized == `"false"` {
+	case "false", "0", `"false"`:
 		*b = false
-	} else {
+	default:
 		return fmt.Errorf("invalid value '%s'", normalized)
 	}
 
