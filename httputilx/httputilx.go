@@ -245,7 +245,7 @@ func DoExponentialBackoff(req *http.Request, options ...ExponentialBackoffOption
 
 		resp, err := o.client.Do(reqClone)
 		if !o.shouldRetry(resp, err) || attempt >= o.maxRetries {
-			return resp, nil
+			return resp, err
 		}
 
 		logArgs := []any{
