@@ -232,15 +232,27 @@ func DoExponentialBackoff(req *http.Request, options ...ExponentialBackoffOption
 
 	backoff := o.initialBackoff
 
+	// Read the request body once if it exists, so we can replay it on retries.
+	// This is necessary because some body types (like manually wrapped
+	// io.NopCloser) don't have GetBody set, causing "ContentLength=N with Body
+	// length 0" errors when req.Clone() tries to reuse the exhausted body.
+	var bodyBytes []byte
+	if req.Body != nil {
+		var err error
+		bodyBytes, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read request body")
+		}
+		if err := req.Body.Close(); err != nil {
+			return nil, errors.Wrap(err, "failed to close request body")
+		}
+	}
+
 	for attempt := 0; attempt <= o.maxRetries; attempt++ {
 		reqClone := req.Clone(req.Context())
-		if req.Body != nil {
-			if seeker, ok := req.Body.(interface {
-				Seek(int64, int) (int64, error)
-			}); ok {
-				_, _ = seeker.Seek(0, 0)
-			}
-			reqClone.Body = req.Body
+		if bodyBytes != nil {
+			reqClone.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+			reqClone.ContentLength = int64(len(bodyBytes))
 		}
 
 		resp, err := o.client.Do(reqClone)
