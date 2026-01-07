@@ -230,6 +230,7 @@ func TestDoExponentialBackoff(t *testing.T) {
 		name         string
 		options      []ExponentialBackoffOption
 		handler      http.HandlerFunc
+		requestBody  io.Reader
 		wantBody     string
 		wantErr      string
 		wantAttempts int
@@ -323,6 +324,55 @@ func TestDoExponentialBackoff(t *testing.T) {
 			wantErr:      "",
 			wantAttempts: 3,
 		},
+		{
+			name: "RequestBodyCopiedOnRetry",
+			options: []ExponentialBackoffOption{
+				ExponentialBackoffWithConfig(4, 100*time.Millisecond, 5*time.Second, 2.0),
+			},
+			handler: func() http.HandlerFunc {
+				initialBody := "request body content"
+
+				attempts := 0
+				return func(w http.ResponseWriter, r *http.Request) {
+					attempts++
+
+					if r.ContentLength != int64(len(initialBody)) {
+						w.WriteHeader(http.StatusInternalServerError)
+						_, _ = fmt.Fprintf(w, "wrong content-length: got %d, want %d", r.ContentLength, len(initialBody))
+						return
+					}
+
+					body, err := io.ReadAll(r.Body)
+					if err != nil {
+						w.WriteHeader(http.StatusInternalServerError)
+						return
+					}
+
+					if len(body) != len(initialBody) {
+						w.WriteHeader(http.StatusInternalServerError)
+						_, _ = fmt.Fprintf(w, "content-length mismatch: header=%d actual=%d", r.ContentLength, len(body))
+						return
+					}
+
+					// Verify body is correctly sent on all attempts
+					if string(body) != initialBody {
+						w.WriteHeader(http.StatusInternalServerError)
+						_, _ = fmt.Fprintf(w, "incorrect body: %q", string(body))
+						return
+					}
+					if attempts < 3 {
+						w.WriteHeader(http.StatusInternalServerError)
+						return
+					}
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte("body received correctly"))
+				}
+			}(),
+			requestBody:  io.NopCloser(bytes.NewBuffer([]byte("request body content"))),
+			wantBody:     "body received correctly",
+			wantErr:      "",
+			wantAttempts: 3,
+		},
 	}
 
 	for _, tt := range tests {
@@ -334,7 +384,11 @@ func TestDoExponentialBackoff(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			req, err := http.NewRequest(http.MethodGet, ts.URL, nil)
+			method := http.MethodGet
+			if tt.requestBody != nil {
+				method = http.MethodPost
+			}
+			req, err := http.NewRequest(method, ts.URL, tt.requestBody)
 			if err != nil {
 				t.Fatalf("failed to create request: %v", err)
 			}
