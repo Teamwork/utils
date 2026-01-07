@@ -384,7 +384,11 @@ func TestDoExponentialBackoff(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			req, err := http.NewRequest(http.MethodGet, ts.URL, tt.requestBody)
+			method := http.MethodGet
+			if tt.requestBody != nil {
+				method = http.MethodPost
+			}
+			req, err := http.NewRequest(method, ts.URL, tt.requestBody)
 			if err != nil {
 				t.Fatalf("failed to create request: %v", err)
 			}
