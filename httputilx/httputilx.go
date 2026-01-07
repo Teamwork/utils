@@ -232,27 +232,10 @@ func DoExponentialBackoff(req *http.Request, options ...ExponentialBackoffOption
 
 	backoff := o.initialBackoff
 
-	// Read the request body once if it exists, so we can replay it on retries.
-	// This is necessary because some body types (like manually wrapped
-	// io.NopCloser) don't have GetBody set, causing "ContentLength=N with Body
-	// length 0" errors when req.Clone() tries to reuse the exhausted body.
-	var bodyBytes []byte
-	if req.Body != nil {
-		var err error
-		bodyBytes, err = io.ReadAll(req.Body)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to read request body")
-		}
-		if err := req.Body.Close(); err != nil {
-			return nil, errors.Wrap(err, "failed to close request body")
-		}
-	}
-
 	for attempt := 0; attempt <= o.maxRetries; attempt++ {
-		reqClone := req.Clone(req.Context())
-		if bodyBytes != nil {
-			reqClone.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-			reqClone.ContentLength = int64(len(bodyBytes))
+		reqClone, err := cloneWithBody(req)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to clone request with body")
 		}
 
 		resp, err := o.client.Do(reqClone)
@@ -283,4 +266,57 @@ func DoExponentialBackoff(req *http.Request, options ...ExponentialBackoffOption
 	}
 
 	return nil, fmt.Errorf("request failed after %d attempts", o.maxRetries+1)
+}
+
+func cloneWithBody(req *http.Request) (*http.Request, error) {
+	newReq := req.Clone(req.Context())
+	if req.Body == nil {
+		return newReq, nil
+	}
+	if req.GetBody != nil {
+		var err error
+		newReq.Body, err = req.GetBody()
+		if err != nil {
+			return nil, err
+		}
+		return newReq, nil
+	}
+
+	if seeker, ok := req.Body.(io.Seeker); ok {
+		if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+			return nil, err
+		}
+		newReq.Body = req.Body
+		newReq.GetBody = func() (io.ReadCloser, error) {
+			if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+				return nil, err
+			}
+			return req.Body, nil
+		}
+		return newReq, nil
+	}
+
+	bodyBytes, err := io.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
+	if err := req.Body.Close(); err != nil {
+		return nil, err
+	}
+
+	createBody := func(bodyBytes []byte) func() (io.ReadCloser, error) {
+		return func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(bodyBytes)), nil
+		}
+	}
+
+	req.GetBody = createBody(bodyBytes)
+	req.Body, _ = req.GetBody()
+	req.ContentLength = int64(len(bodyBytes))
+
+	newReq.GetBody = createBody(bodyBytes)
+	newReq.Body, _ = newReq.GetBody()
+	newReq.ContentLength = int64(len(bodyBytes))
+
+	return newReq, nil
 }
