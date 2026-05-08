@@ -107,3 +107,80 @@ func TestGetValue(t *testing.T) {
 		t.Fatalf("error not found expected, got %v", err)
 	}
 }
+
+func TestSetValue(t *testing.T) {
+	m := map[string]any{}
+
+	// simple int set
+	err := SetValue(m, 10, "a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m["a"] == nil {
+		t.Fatal("expected key 'a'")
+	}
+	if v, ok := m["a"].(int); !ok || v != 10 {
+		t.Fatalf("expected 10, got %v", v)
+	}
+
+	// simple string set
+	str := "mystring"
+	err = SetValue(m, str, "b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m["b"] == nil {
+		t.Fatal("expected key 'b'")
+	}
+	if v, ok := m["b"].(string); !ok || v != str {
+		t.Fatalf("expected '%v', got %v", str, v)
+	}
+
+	// nested set
+	err = SetValue(m, 2, "c", "d")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m["c"] == nil {
+		t.Fatal("expected key 'b'")
+	}
+	nested, ok := m["c"].(map[string]any)
+	if !ok {
+		t.Fatalf("expected map, got %T", nested)
+	}
+	if nested["d"] == nil {
+		t.Fatal("expected key 'd'")
+	}
+	if v, ok := nested["d"].(int); !ok || v != 2 {
+		t.Fatalf("expected 2, got %v", v)
+	}
+
+	// replace
+	err = SetValue(map[string]any{"a": 10}, 10, "a")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m["a"] == nil {
+		t.Fatal("expected key 'a'")
+	}
+	if v, ok := m["a"].(int); !ok || v != 10 {
+		t.Fatalf("expected 10, got %v", v)
+	}
+
+	// replace tip
+	m = map[string]any{"a": map[string]any{"b": 1}}
+	err = SetValue(m, 10, "a", "b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v, _ := m["a"].(map[string]any)["b"].(int); v != 10 {
+		t.Fatalf("expected 10, got %v", v)
+	}
+
+	// crash when mid key is not a map
+	m = map[string]any{"a": map[string]any{"b": 1}}
+	err = SetValue(m, 10, "a", "b", "c")
+	if err != ErrWrongType {
+		t.Fatal(err)
+	}
+}

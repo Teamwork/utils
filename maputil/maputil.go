@@ -21,6 +21,29 @@ var (
 	ErrNotFound  = errors.New("key not found")
 )
 
+// SetValue set value using key path
+func SetValue[T any](m map[string]any, v T, keys ...string) error {
+	if len(keys) == 1 {
+		m[keys[0]] = v
+		return nil
+	}
+
+	next := m[keys[0]]
+	var nextMap map[string]any
+	if next == nil {
+		nextMap = map[string]any{}
+		m[keys[0]] = nextMap
+	} else {
+		var ok bool
+		nextMap, ok = next.(map[string]any)
+		if !ok {
+			return ErrWrongType
+		}
+	}
+
+	return SetValue(nextMap, v, keys[1:]...)
+}
+
 // GetValue returns the value defined as a key path
 func GetValue[T any](m map[string]any, keys ...string) (T, error) {
 	var out T
