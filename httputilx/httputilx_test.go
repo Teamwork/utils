@@ -201,15 +201,36 @@ func chunk(s string) string {
 
 // TODO: better to not depend on interwebz...
 func TestFetch(t *testing.T) {
+	// Served locally rather than from httpbin.org: the external service returns
+	// a 503 often enough to fail the build for reasons unrelated to any change.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/html":
+			_, _ = w.Write([]byte("<html><body>hello</body></html>"))
+		case "/status/400":
+			w.WriteHeader(http.StatusBadRequest)
+		case "/status/500":
+			w.WriteHeader(http.StatusInternalServerError)
+		case "/status/418":
+			w.WriteHeader(http.StatusTeapot)
+			_, _ = w.Write([]byte("teapot"))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer srv.Close()
+
 	cases := []struct {
 		in, want, wantErr string
 	}{
-		{"http://example.com", "<html", ""},
-		{"http://fairly-certain-this-doesnt-exist-asdasd12g1ghdfddd.com", "", "cannot download"},
-		{"http://httpbin.org/status/400", "", "400"},
-		{"http://httpbin.org/status/500", "", "500"},
+		{srv.URL + "/html", "<html", ""},
+		// Port 1 is never listening, so this fails to connect without needing
+		// DNS for a domain that does not exist.
+		{"http://127.0.0.1:1", "", "cannot download"},
+		{srv.URL + "/status/400", "", "400"},
+		{srv.URL + "/status/500", "", "500"},
 		// Make sure we return the body as well.
-		{"http://httpbin.org/status/418", "teapot", "418"},
+		{srv.URL + "/status/418", "teapot", "418"},
 	}
 
 	for _, tc := range cases {
