@@ -63,10 +63,10 @@ func ResolvePackage(path string, mode build.ImportMode) (pkg *build.Package, err
 		return nil, errors.New("cannot resolve empty string")
 	}
 
-	switch path[0] {
-	case '/':
+	switch {
+	case isAbsPath(path):
 		pkg, err = build.ImportDir(path, mode)
-	case '.':
+	case path[0] == '.':
 		path, err = filepath.Abs(path)
 		if err != nil {
 			return nil, err
@@ -86,6 +86,29 @@ func ResolvePackage(path string, mode build.ImportMode) (pkg *build.Package, err
 	}
 
 	return pkg, err
+}
+
+// isAbsPath reports whether p is an absolute path under either Unix or Windows
+// conventions. filepath.IsAbs only knows the host's convention, so on Unix it
+// rejects `C:\dir` and on Windows it rejects `/dir`.
+func isAbsPath(p string) bool {
+	if filepath.IsAbs(p) || strings.HasPrefix(p, "/") {
+		return true
+	}
+	if strings.HasPrefix(p, `\\`) { // UNC path
+		return true
+	}
+	// Drive letter, e.g. C:\dir or C:/dir
+	return len(p) >= 3 && p[1] == ':' && (p[2] == '\\' || p[2] == '/') &&
+		(('A' <= p[0] && p[0] <= 'Z') || ('a' <= p[0] && p[0] <= 'z'))
+}
+
+// dirName returns the name of the directory containing file, accepting both
+// separators so a Windows path resolves on any host: path.Dir is slash-only and
+// returns "." for `C:\src\pkg\file.go`. A literal backslash in a Unix file
+// name is treated as a separator, which Go source paths never rely on.
+func dirName(file string) string {
+	return path.Base(path.Dir(strings.ReplaceAll(file, `\`, "/")))
 }
 
 // ResolveWildcard finds all subpackages in the "example/..." format. The
@@ -198,7 +221,7 @@ func ResolveImport(file, pkgName string) (string, error) {
 
 	r, ok := imports[pkgName]
 	if !ok {
-		currentPkg := path.Base(path.Dir(file))
+		currentPkg := dirName(file)
 		if pkgName == currentPkg {
 			r = "."
 		}

@@ -319,3 +319,51 @@ func TestTagName(t *testing.T) {
 
 	})
 }
+
+func TestIsAbsPath(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"/home/dev/proj", true},
+		{"/", true},
+		{`C:\Users\dev\proj`, true},
+		{"C:/Users/dev/proj", true},
+		{`c:\users\dev`, true},
+		{`\\server\share\proj`, true},
+		{"github.com/teamwork/utils", false},
+		{"./proj", false},
+		{"proj", false},
+		{"", false},
+		{"C:", false},
+		{"1:/nope", false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.in, func(t *testing.T) {
+			if out := isAbsPath(tc.in); out != tc.want {
+				t.Errorf("\nout:  %v\nwant: %v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestDirName(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"/home/dev/go/src/example/pkg/file.go", "pkg"},
+		{`C:\Users\dev\go\src\example\pkg\file.go`, "pkg"},
+		{"C:/Users/dev/go/src/example/pkg/file.go", "pkg"},
+		{"pkg/file.go", "pkg"},
+		{"file.go", "."},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.in, func(t *testing.T) {
+			if out := dirName(tc.in); out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
